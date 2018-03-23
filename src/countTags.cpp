@@ -188,6 +188,8 @@ int main (int argc, char *argv[]) {
   if (options[TAG_NAMES]) {
     print_tag_names = true;
   }
+ for (option::Option* opt = options[UNKNOWN]; opt; opt = opt->next())
+      std::cout << "Unknown option: " << opt->name << "\n";
 
   if(parse.nonOptionsCount() < 2) {
     option::printUsage(std::cout, usage);
