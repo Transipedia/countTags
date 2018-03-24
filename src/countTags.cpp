@@ -16,6 +16,7 @@
 //#include <zlib.h>
 
 #define MILLION 1000000
+#define VERS "0.3"
 
 //return the minumum value of the k-mer at pos p between strand rev and stran fwd
 //TODO add a function that get a DNA string and a k value, and return a array of vector values
@@ -80,13 +81,15 @@ struct Arg: public option::Arg
   }
 };
 
-enum  optionIndex {UNKNOWN,HELP,PROBE_LENGTH,STRANDED,MAX_READS,NB_THREADS,NORMALIZE,TAG_NAMES};
+enum  optionIndex {UNKNOWN,HELP,VERSION,PROBE_LENGTH,STRANDED,MAX_READS,NB_THREADS,NORMALIZE,TAG_NAMES};
 const option::Descriptor usage[] =
 {
   {UNKNOWN, 0,"" , ""    ,
     option::Arg::None, "USAGE: countTags [options] tags.fa seq.fastq[.gz]\n\nOptions:" },
   {HELP,    0,"h" , "help",
     option::Arg::None, "  --help  \tPrint usage and exit." },
+  {VERSION, 0,"v" , "version",
+    option::Arg::None, "  --version  \tPrint version and exit." },
   {PROBE_LENGTH, 0, "k","",
     Arg::Numeric,      "  -k INT      \ttags length" },
   {MAX_READS, 0, "m","",
@@ -160,6 +163,11 @@ int main (int argc, char *argv[]) {
 
   if (options[HELP] || argc == 0) {
     option::printUsage(std::cout, usage);
+    return 0;
+  }
+
+  if (options[VERSION]) {
+    std::cout << VERS;
     return 0;
   }
 
