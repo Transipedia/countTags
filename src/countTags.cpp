@@ -85,7 +85,7 @@ const option::Descriptor usage[] =
 {
   {UNKNOWN, 0,"" , ""    ,
     option::Arg::None, "USAGE: countTags [options] tags.fa seq.fastq[.gz]\n\nOptions:" },
-  {HELP,    0,"" , "help",
+  {HELP,    0,"h" , "help",
     option::Arg::None, "  --help  \tPrint usage and exit." },
   {PROBE_LENGTH, 0, "k","",
     Arg::Numeric,      "  -k INT      \ttags length" },
