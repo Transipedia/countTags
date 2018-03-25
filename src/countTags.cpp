@@ -85,7 +85,8 @@ enum  optionIndex {UNKNOWN,HELP,VERBOSE,VERSION,PROBE_LENGTH,STRANDED,MAX_READS,
 const option::Descriptor usage[] =
 {
   {UNKNOWN,      0, "" , "",
-    option::Arg::None, "USAGE: countTags [options] tags.file seq.fastq[.gz]\n"
+    option::Arg::None, "The purpose of countTags is to count occurences of few tags in large set of fastq files.\n\n"
+                       "USAGE: countTags [options] tags.file seq.fastq[.gz]\n"
                        "======\n"
                        " * Tags file format: fasta, tsv (tag[ \\t]name) or raw (tag)\n"
                        " * Use '-' for reading tags from STDIN\n"
