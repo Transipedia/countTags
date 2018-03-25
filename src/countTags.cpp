@@ -81,14 +81,16 @@ struct Arg: public option::Arg
   }
 };
 
-enum  optionIndex {UNKNOWN,HELP,VERSION,PROBE_LENGTH,STRANDED,MAX_READS,NB_THREADS,NORMALIZE,TAG_NAMES};
+enum  optionIndex {UNKNOWN,HELP,VERBOSE,VERSION,PROBE_LENGTH,STRANDED,MAX_READS,NB_THREADS,NORMALIZE,TAG_NAMES};
 const option::Descriptor usage[] =
 {
   {UNKNOWN, 0,"" , ""    ,
     option::Arg::None, "USAGE: countTags [options] tags.fa seq.fastq[.gz]\n\nOptions:" },
   {HELP,    0,"h" , "help",
     option::Arg::None, "  --help  \tPrint usage and exit." },
-  {VERSION, 0,"v" , "version",
+  {VERBOSE, 0,"v" , "verbose",
+    option::Arg::None, "  -v|-vv|--verbose  \tPrint on STDERR some information." },
+  {VERSION, 0,"" , "version",
     option::Arg::None, "  --version  \tPrint version and exit." },
   {PROBE_LENGTH, 0, "k","",
     Arg::Numeric,      "  -k INT      \ttags length" },
@@ -152,6 +154,8 @@ int main (int argc, char *argv[]) {
    *        Parsing options
    *
    *********************************/
+  int verbose = 0; // verbose level
+
   argc-=(argc>0); argv+=(argc>0); // skip program name argv[0] if present
   option::Stats  stats(usage, argc, argv);
   option::Option options[stats.options_max], buffer[stats.buffer_max];
@@ -168,6 +172,10 @@ int main (int argc, char *argv[]) {
   if (options[VERSION]) {
     std::cout << VERS;
     return 0;
+  }
+
+  if (options[VERBOSE]) {
+    verbose = options[VERBOSE].count();
   }
 
   // TODO we should check the length to choose the appropriate
@@ -218,7 +226,8 @@ int main (int argc, char *argv[]) {
    *********************************/
   line_id = 0;
 
-  std::cerr << "Counting k-mers" << std::endl;
+  if (verbose)
+    std::cerr << "Counting k-mers" << std::endl;
   // Create hash table of k-mer counts
   line_id = 0;
   nb_tags = 0;
@@ -235,6 +244,7 @@ int main (int argc, char *argv[]) {
       // we got a fasta line
       tag_name = lines;
       tag_name.erase(0,1); // remove the fasta ">" prefix
+      if (verbose>2)
         std::cerr << "Find fasta line: " << tag_name << std::endl;
     } else {
       // Check if we have a raw or tsv line: tag\tname
@@ -245,6 +255,7 @@ int main (int argc, char *argv[]) {
       }
       // convert tag to Int
       tag = DNAtoInt(lines.c_str(),tag_length,stranded);
+      if (verbose>2)
         std::cerr << "tag: " << lines << ", name:" << tag_name << ", tagInt: " << tag;
       tags_counts[tag] = new double[nb_samples]();
       tags_names[tag].push_back(tag_name);
@@ -253,7 +264,8 @@ int main (int argc, char *argv[]) {
     line_id++;
   }
 
-  std::cerr << "Finished indexing tags" << std::endl;
+   if (verbose)
+     std::cerr << "Finished indexing tags" << std::endl;
 
 
   /**********************************
@@ -263,7 +275,8 @@ int main (int argc, char *argv[]) {
    *********************************/
 //#pragma omp parallel num_threads(nb_threads)
   for (int s = 0; s < nb_samples; ++s) {
-    std::cerr << "Counting tags for file: " << parse.nonOption(s+1) << "\n";
+    if (verbose)
+       std::cerr << "Counting tags for file: " << parse.nonOption(s+1) << "\n";
 
     line = NULL;
     len = 0;
@@ -281,7 +294,8 @@ int main (int argc, char *argv[]) {
         }
         // Print a user-friendly output on STDERR every each XXXX reads processed
         if(read_id % MILLION == 0) {
-          std::cerr << (int)((double)line_id*0.25) + 1 << " reads parsed" << std::endl;
+          if (verbose)
+            std::cerr << (int)((double)line_id*0.25) + 1 << " reads parsed" << std::endl;
         }
         // set seq to line
         seq = line;
@@ -310,7 +324,8 @@ int main (int argc, char *argv[]) {
     nb_factors_by_sample.push_back(nb_factors);
 
     if(normalize && nb_factors > 0) {
-      std::cerr << "Normalize counts" << std::endl;
+      if (verbose)
+        std::cerr << "Normalize counts" << std::endl;
       for (it_counts=tags_counts.begin(); it_counts!=tags_counts.end(); ++it_counts) {
         // TODO We should take into accout the error rate...
         if(it_counts->second[s] > 0)
