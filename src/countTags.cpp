@@ -85,25 +85,27 @@ enum  optionIndex {UNKNOWN,HELP,VERBOSE,VERSION,PROBE_LENGTH,STRANDED,MAX_READS,
 const option::Descriptor usage[] =
 {
   {UNKNOWN, 0,"" , ""    ,
-    option::Arg::None, "USAGE: countTags [options] tags.fa seq.fastq[.gz]\n\nOptions:" },
+    option::Arg::None, "USAGE: countTags [options] tags.file seq.fastq[.gz]\n"
+                       " * Tags file format: fasta, tsv (tag[ \\t]name) or raw (tag)\n" },
   {HELP,    0,"h" , "help",
     option::Arg::None, "  --help  \tPrint usage and exit." },
   {VERBOSE, 0,"v" , "verbose",
-    option::Arg::None, "  -v|-vv|--verbose  \tPrint on STDERR some information." },
+    option::Arg::None, "  -v||--verbose  \tPrint on STDERR some informations"
+                       "  -vvv           \tPrint on STDERR debug informations." },
   {VERSION, 0,"" , "version",
     option::Arg::None, "  --version  \tPrint version and exit." },
   {PROBE_LENGTH, 0, "k","",
-    Arg::Numeric,      "  -k INT      \ttags length" },
+    Arg::Numeric,      "  -k INT      \ttags length." },
   {MAX_READS, 0, "m","",
-    Arg::Numeric,      "  -m INT      \tmax number of reads" },
+    Arg::Numeric,      "  -m INT      \tmax number of reads." },
   //{NB_THREADS, 0, "t","",
   //  Arg::Numeric,      "  -t=INT      \tnumber of threads" },
   {STRANDED,    0,"" , "stranded",
-    option::Arg::None, "  --stranded  \tstrand-specific protocol" },
+    option::Arg::None, "  --stranded  \tstrand-specific protocol." },
   {NORMALIZE,    0,"" , "normalize",
-    option::Arg::None, "  --normalize  \tnormalize counts" },
+    option::Arg::None, "  --normalize  \tnormalize counts." },
   {TAG_NAMES,    0,"" , "tag-names",
-    option::Arg::None, "  --tag-names  \tprint tag names in the output" },
+    option::Arg::None, "  --tag-names  \tprint tag names in the output." },
   {0,0,0,0,0,0}
 };
 
