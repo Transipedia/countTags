@@ -84,29 +84,37 @@ struct Arg: public option::Arg
 enum  optionIndex {UNKNOWN,HELP,VERBOSE,VERSION,PROBE_LENGTH,STRANDED,MAX_READS,NB_THREADS,NORMALIZE,TAG_NAMES};
 const option::Descriptor usage[] =
 {
-  {UNKNOWN, 0,"" , ""    ,
+  {UNKNOWN,      0, "" , "",
     option::Arg::None, "USAGE: countTags [options] tags.file seq.fastq[.gz]\n"
+                       "======\n"
                        " * Tags file format: fasta, tsv (tag[ \\t]name) or raw (tag)\n"
-                       " * Use '-' for reading tags from STDIN\n\nOptions:" },
-  {HELP,    0,"h" , "help",
-    option::Arg::None, "  --help  \tPrint usage and exit." },
-  {VERBOSE, 0,"v" , "verbose",
-    option::Arg::None, "  -v||--verbose  \tPrint on STDERR some informations"
-                       "  -vvv           \tPrint on STDERR debug informations." },
-  {VERSION, 0,"" , "version",
-    option::Arg::None, "  --version  \tPrint version and exit." },
+                       " * Use '-' for reading tags from STDIN\n"
+                       "\nOptions:\n"
+                       "========" },
+  {HELP,         0, "h", "help",
+    option::Arg::None, "  -h|--help  \tPrint usage and exit." },
+  {VERBOSE,      0, "v", "verbose",
+    option::Arg::None, "  -v|--verbose  \tPrint progress status on STDERR\n"
+                       "  -vvv          \tPrint debug informations on STDERR." },
+  {VERSION,      0, "V", "version",
+    option::Arg::None, "  -V|--version  \tPrint version and exit." },
   {PROBE_LENGTH, 0, "k","",
-    Arg::Numeric,      "  -k INT      \ttags length." },
-  {MAX_READS, 0, "m","",
-    Arg::Numeric,      "  -m INT      \tmax number of reads." },
+    Arg::Numeric,      "  -k INT      \ttags length [default: 22]." },
+  {MAX_READS,    0, "m", "",
+    Arg::Numeric,      "  -m INT      \tmax number of reads [default: UINT32_MAX]." },
   //{NB_THREADS, 0, "t","",
   //  Arg::Numeric,      "  -t=INT      \tnumber of threads" },
-  {STRANDED,    0,"" , "stranded",
+  {STRANDED,     0, "" , "stranded",
     option::Arg::None, "  --stranded  \tstrand-specific protocol." },
-  {NORMALIZE,    0,"" , "normalize",
+  {NORMALIZE,    0, "" , "normalize",
     option::Arg::None, "  --normalize  \tnormalize counts." },
-  {TAG_NAMES,    0,"" , "tag-names",
-    option::Arg::None, "  --tag-names  \tprint tag names in the output." },
+  {TAG_NAMES,    0, "t", "tag-names",
+    option::Arg::None, "  -t|--tag-names  \tprint tag names in the output." },
+  {UNKNOWN,      0, "" , "",
+    option::Arg::None, "\nExamples:\n"
+                       "=========\n"
+                       " * countTags -k 30 --stranded -t MyBestTags.tsv MyAllFastq*.gz > MyCount.tsv\n"
+                       " * countTags -k 30 -t - MyAllFastq*.gz < MyBestTags.raw\n" },
   {0,0,0,0,0,0}
 };
 
