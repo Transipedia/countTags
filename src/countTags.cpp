@@ -86,7 +86,8 @@ const option::Descriptor usage[] =
 {
   {UNKNOWN, 0,"" , ""    ,
     option::Arg::None, "USAGE: countTags [options] tags.file seq.fastq[.gz]\n"
-                       " * Tags file format: fasta, tsv (tag[ \\t]name) or raw (tag)\n" },
+                       " * Tags file format: fasta, tsv (tag[ \\t]name) or raw (tag)\n"
+                       " * Use '-' for reading tags from STDIN\n\nOptions:" },
   {HELP,    0,"h" , "help",
     option::Arg::None, "  --help  \tPrint usage and exit." },
   {VERBOSE, 0,"v" , "verbose",
@@ -233,15 +234,24 @@ int main (int argc, char *argv[]) {
   // Create hash table of k-mer counts
   line_id = 0;
   nb_tags = 0;
-  std::ifstream filein(tags_file, std::ifstream::in);
-  // check if not read error
-  if (filein.fail()) {
-    std::cerr << "Error: Can't read "<< tags_file << std::endl;
-    return 1;
+
+  std::istream *filein;
+  std::ifstream fileif;
+  if (strlen(tags_file) == 1) {
+    // use stdin
+    filein = &std::cin;
+  } else {
+    fileif.open(tags_file, std::ifstream::in);
+    // check if not read error
+    if (fileif.fail()) {
+      std::cerr << "Error: Can't read "<< tags_file << std::endl;
+      return 1;
+    }
+    filein = &fileif;
   }
   bool no_name = 1;
   // Parse file and detect file format (fas, raw or tsv)
-  for (std::string lines; std::getline(filein, lines); ) {
+  for (std::string lines; std::getline(*filein, lines); ) {
     if (lines.find(">") != std::string::npos) {
       // we got a fasta line
       no_name = 0;
