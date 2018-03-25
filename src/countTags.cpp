@@ -1,5 +1,6 @@
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <iterator>
 #include <string.h>
 #include <cstdint>
@@ -140,7 +141,6 @@ int main (int argc, char *argv[]) {
 
   // File vars
   std::string gzip_pipe = "gunzip -fc ";
-  std::string cat_pipe = "cat ";
   std::string tmp;
   FILE * file;
   char * line = NULL;
@@ -217,30 +217,38 @@ int main (int argc, char *argv[]) {
    *   Create tags counting table
    *
    *********************************/
-  file = popen(tmp.append(cat_pipe).append(tags_file).c_str(),"r");
   line_id = 0;
 
   std::cerr << "Counting k-mers" << std::endl;
   // Create hash table of k-mer counts
   line_id = 0;
   nb_tags = 0;
-  while ((read = getline(&line, &len, file)) != -1) {
-    if(line_id % 2 == 0) {
-      tag_name = line;
-      tag_name.pop_back(); // remove new_line char
-      tag_name.erase(0,1); // remove the fasta ">" prefix
-    }
-    if(line_id % 2 == 1) {
-      tag = DNAtoInt(line,tag_length,stranded);
-      tags_counts[tag] = new double[nb_samples]();
-      tags_names[tag].push_back(tag_name);
-      nb_tags++;
-    }
-    line_id++;
+  std::ifstream filein(tags_file, std::ifstream::in);
+  // check if not read error
+  if (filein.fail()) {
+    std::cerr << "Error: Can't read "<< tags_file << std::endl;
+    return 1;
   }
-  fclose(file);
-  if (line)
-    free(line);
+  // Parse file and detect file format (fas, raw or tsv)
+  for (std::string lines; std::getline(filein, lines); ) {
+     if (lines.find(">") != std::string::npos) {
+       // we got a fasta line
+       tag_name = lines;
+       tag_name.erase(0,1); // remove the fasta ">" prefix
+     } else {
+       // Check if we have a raw or tsv line: tag\tname
+       std::size_t found = lines.find_first_of(" \t");
+       if (found != std::string::npos) {
+         tag_name = lines.substr(found+1);
+         lines.erase(found, lines.length());
+       }
+       tag = DNAtoInt(lines.c_str(),tag_length,stranded);
+       tags_counts[tag] = new double[nb_samples]();
+       tags_names[tag].push_back(tag_name);
+       nb_tags++;
+     }
+     line_id++;
+  }
 
   std::cerr << "Finished indexing tags" << std::endl;
 
