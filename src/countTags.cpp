@@ -237,11 +237,12 @@ int main (int argc, char *argv[]) {
     std::cerr << "Error: Can't read "<< tags_file << std::endl;
     return 1;
   }
+  bool no_name = 1;
   // Parse file and detect file format (fas, raw or tsv)
   for (std::string lines; std::getline(filein, lines); ) {
-    std::string tag_name = "";
     if (lines.find(">") != std::string::npos) {
       // we got a fasta line
+      no_name = 0;
       tag_name = lines;
       tag_name.erase(0,1); // remove the fasta ">" prefix
       if (verbose>2)
@@ -250,11 +251,12 @@ int main (int argc, char *argv[]) {
       // Check if we have a raw or tsv line: tag\tname
       std::size_t found = lines.find_first_of(" \t");
       if (found != std::string::npos) {
+        no_name = 0;
         tag_name = lines.substr(found+1);
         lines.erase(found, lines.length());
       }
       // insert nb_tags as tag_name if none read
-      if (tag_name.empty())
+      if (no_name)
         tag_name = std::to_string(nb_tags+1);
       // convert tag to Int
       tag = DNAtoInt(lines.c_str(),tag_length,stranded);
