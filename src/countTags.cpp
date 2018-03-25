@@ -255,7 +255,7 @@ int main (int argc, char *argv[]) {
       }
       // insert nb_tags as tag_name if none read
       if (tag_name.empty())
-        tag_name = std::to_string(nb_tags);
+        tag_name = std::to_string(nb_tags+1);
       // convert tag to Int
       tag = DNAtoInt(lines.c_str(),tag_length,stranded);
       if (verbose>2)
@@ -263,6 +263,8 @@ int main (int argc, char *argv[]) {
       tags_counts[tag] = new double[nb_samples]();
       tags_names[tag].push_back(tag_name);
       nb_tags++;
+      if (verbose>2)
+       std::cerr << ", nb_tag: " << nb_tags << std::endl;
     }
     line_id++;
   }
