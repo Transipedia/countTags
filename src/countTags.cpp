@@ -6,7 +6,6 @@
 #include <cstdint>
 #include <vector>
 #include <unordered_map>
-//#include <fstream>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -231,23 +230,27 @@ int main (int argc, char *argv[]) {
   }
   // Parse file and detect file format (fas, raw or tsv)
   for (std::string lines; std::getline(filein, lines); ) {
-     if (lines.find(">") != std::string::npos) {
-       // we got a fasta line
-       tag_name = lines;
-       tag_name.erase(0,1); // remove the fasta ">" prefix
-     } else {
-       // Check if we have a raw or tsv line: tag\tname
-       std::size_t found = lines.find_first_of(" \t");
-       if (found != std::string::npos) {
-         tag_name = lines.substr(found+1);
-         lines.erase(found, lines.length());
-       }
-       tag = DNAtoInt(lines.c_str(),tag_length,stranded);
-       tags_counts[tag] = new double[nb_samples]();
-       tags_names[tag].push_back(tag_name);
-       nb_tags++;
-     }
-     line_id++;
+    std::string tag_name = "";
+    if (lines.find(">") != std::string::npos) {
+      // we got a fasta line
+      tag_name = lines;
+      tag_name.erase(0,1); // remove the fasta ">" prefix
+        std::cerr << "Find fasta line: " << tag_name << std::endl;
+    } else {
+      // Check if we have a raw or tsv line: tag\tname
+      std::size_t found = lines.find_first_of(" \t");
+      if (found != std::string::npos) {
+        tag_name = lines.substr(found+1);
+        lines.erase(found, lines.length());
+      }
+      // convert tag to Int
+      tag = DNAtoInt(lines.c_str(),tag_length,stranded);
+        std::cerr << "tag: " << lines << ", name:" << tag_name << ", tagInt: " << tag;
+      tags_counts[tag] = new double[nb_samples]();
+      tags_names[tag].push_back(tag_name);
+      nb_tags++;
+    }
+    line_id++;
   }
 
   std::cerr << "Finished indexing tags" << std::endl;
