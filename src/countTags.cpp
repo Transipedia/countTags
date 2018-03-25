@@ -253,6 +253,9 @@ int main (int argc, char *argv[]) {
         tag_name = lines.substr(found+1);
         lines.erase(found, lines.length());
       }
+      // insert nb_tags as tag_name if none read
+      if (tag_name.empty())
+        tag_name = std::to_string(nb_tags);
       // convert tag to Int
       tag = DNAtoInt(lines.c_str(),tag_length,stranded);
       if (verbose>2)
