@@ -321,9 +321,8 @@ int main (int argc, char *argv[]) {
           break;
         }
         // Print a user-friendly output on STDERR every each XXXX reads processed
-        if(read_id % MILLION == 0) {
-          if (verbose)
-            std::cerr << (int)((double)line_id*0.25) + 1 << " reads parsed" << std::endl;
+        if (verbose && read_id % MILLION == 0) {
+          std::cerr << (int)((double)line_id*0.25) + 1 << " reads parsed" << std::endl;
         }
         // set seq to line
         seq = line;
