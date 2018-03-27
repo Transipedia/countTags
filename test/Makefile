@@ -44,7 +44,7 @@ init:
 	# Create tsv file format
 	cat $(okfile).csv | sed 's/ /\t/' > $(okfile).tsv
 	# Create fasta file format
-	cat $(okfile).tsv | while read tag count; do echo ">$$count\n$$tag" >> $(okfile).fas; done;
+	cat $(okfile).tsv | while read tag count; do echo ">$$count\n$$tag"; done > $(okfile).fas
 	# Create raw file format
 	cut -d ' ' -f1 $(okfile).csv > $(okfile).raw
 	# Generate expected results
