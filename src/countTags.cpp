@@ -81,7 +81,7 @@ struct Arg: public option::Arg
   }
 };
 
-enum  optionIndex {UNKNOWN,HELP,VERBOSE,VERSION,PROBE_LENGTH,STRANDED,MAX_READS,NB_THREADS,NORMALIZE,TAG_NAMES};
+enum  optionIndex {UNKNOWN,HELP,VERBOSE,VERSION,PROBE_LENGTH,STRANDED,MAX_READS,NB_THREADS,NORMALIZE,TAG_NAMES,MERGE_COUNTS};
 const option::Descriptor usage[] =
 {
   {UNKNOWN,      0, "" , "",
@@ -111,6 +111,8 @@ const option::Descriptor usage[] =
     option::Arg::None, "  --normalize  \tnormalize counts." },
   {TAG_NAMES,    0, "t", "tag-names",
     option::Arg::None, "  -t|--tag-names  \tprint tag names in the output." },
+  {MERGE_COUNTS,    0,"" , "merge-counts",
+    option::Arg::None, "  --merge-counts  \tmerge counts from all input FASTQs" },
   {UNKNOWN,      0, "" , "",
     option::Arg::None, "\nExamples:\n"
                        "=========\n"
@@ -133,6 +135,7 @@ int main (int argc, char *argv[]) {
   bool stranded = false;
   bool normalize = false;
   bool print_tag_names = false;
+  bool merge_counts = false;
   uint32_t nb_tags = 0;
   uint32_t max_reads = UINT32_MAX;
   int nb_threads = 1;
@@ -214,6 +217,10 @@ int main (int argc, char *argv[]) {
 
   if (options[TAG_NAMES]) {
     print_tag_names = true;
+  }
+
+  if (options[MERGE_COUNTS]) {
+    merge_counts = true;
   }
 
   if (options[UNKNOWN]) {
@@ -369,12 +376,18 @@ int main (int argc, char *argv[]) {
   /****
    * PRINT THE RESULTS
    */
+  if (verbose)
+    std::cerr << "tag_length: " << tag_length << "\n";
   // First print headers
   std::cout << "tag";
   if (print_tag_names)
     std::cout << "\ttag_names";
-  for (int s = 0; s < nb_samples; ++s) {
-    std::cout << "\t" << parse.nonOption(s+1);
+  if(!merge_counts) {
+    for (int s = 0; s < nb_samples; ++s) {
+      std::cout << "\t" << parse.nonOption(s+1);
+    }
+  } else {
+    std::cout << "\tcounts";
   }
   std::cout << "\n";
   char *tag_seq = new char[tag_length];
@@ -384,8 +397,16 @@ int main (int argc, char *argv[]) {
     if(print_tag_names) {
       std::cout << "\t" << join(tags_names[it_counts->first],",");
     }
-    for (int s = 0; s < nb_samples; ++s) {
-      std::cout << "\t" << it_counts->second[s];
+    if(!merge_counts){
+      for (int s = 0; s < nb_samples; ++s) {
+        std::cout << "\t" << it_counts->second[s];
+      }
+    } else {
+      double count_sum = 0;
+      for (int s = 0; s < nb_samples; ++s) {
+        count_sum += it_counts->second[s];
+      }
+      std::cout << "\t" << count_sum;
     }
     std::cout << std::endl;
   }
@@ -393,8 +414,16 @@ int main (int argc, char *argv[]) {
   std::cout << "total_factors";
   if (print_tag_names)
     std::cout << "\t*";
-  for (int s = 0; s < nb_samples; ++s) {
-    std::cout << "\t" << nb_factors_by_sample[s];
+  if(!merge_counts) {
+    for (int s = 0; s < nb_samples; ++s) {
+      std::cout << "\t" << nb_factors_by_sample[s];
+    }
+  } else {
+    uint64_t nb_factors_sum = 0;
+    for (int s = 0; s < nb_samples; ++s) {
+      nb_factors_sum += nb_factors_by_sample[s];
+    }
+    std::cout << "\t" << nb_factors_sum;
   }
   std::cout << std::endl;
 
