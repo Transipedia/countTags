@@ -2,6 +2,7 @@ ofile=output_test
 jf=/tmp/test_jellyfish_count.jf
 jfcount=/tmp/jfcount.txt
 okfile=TAGS_test
+countTagsReference=countTags-v0.2
 
 all: test_ok test_error_parsing
 
@@ -35,5 +36,5 @@ init:
 	# Create raw file format
 	cut -d ' ' -f1 $(okfile).csv > $(okfile).raw
 	# Generate expected results
-	countTags --tag-names -k 30 -m 100000 $(okfile).fas test_?.fastq.gz > ok/$(ofile)_with_names_ok.txt
-	countTags -k 30 -m 100000 $(okfile).fas test_?.fastq.gz > ok/$(ofile)_without_names_ok.txt
+	../attic/$(countTagsReference) --tag-names -k 30 -m 100000 $(okfile).fas test_?.fastq.gz > ok/$(ofile)_with_names_ok.txt
+	../attic/$(countTagsReference) -k 30 -m 100000 $(okfile).fas test_?.fastq.gz > ok/$(ofile)_without_names_ok.txt
