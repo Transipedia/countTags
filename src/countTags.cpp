@@ -83,7 +83,7 @@ struct Arg: public option::Arg
   }
 };
 
-enum  optionIndex {UNKNOWN,HELP,VERBOSE,VERSION,PROBE_LENGTH,STRANDED,MAX_READS,NB_THREADS,NORMALIZE,TAG_NAMES};
+enum  optionIndex {UNKNOWN,HELP,VERBOSE,VERSION,KMER_LENGTH,STRANDED,MAX_READS,NB_THREADS,NORMALIZE,TAG_NAMES};
 const option::Descriptor usage[] =
 {
   {UNKNOWN,      0, "" , "",
@@ -101,8 +101,8 @@ const option::Descriptor usage[] =
                        "  -vvv          \tPrint debug informations on STDERR." },
   {VERSION,      0, "V", "version",
     option::Arg::None, "  -V|--version  \tPrint version and exit." },
-  {PROBE_LENGTH, 0, "k","",
-    Arg::Numeric,      "  -k INT      \ttags length [default: 22]." },
+  {KMER_LENGTH, 0, "k","",
+    Arg::Numeric,      "  -k INT      \ttag length [default: 22]." },
   {MAX_READS,    0, "m", "",
     Arg::Numeric,      "  -m INT      \tmax number of reads [default: UINT32_MAX]." },
   //{NB_THREADS, 0, "t","",
@@ -194,8 +194,8 @@ int main (int argc, char *argv[]) {
 
   // TODO we should check the length to choose the appropriate
   // integer size to use
-  if (options[PROBE_LENGTH]) {
-    tag_length = atoi(options[PROBE_LENGTH].arg);
+  if (options[KMER_LENGTH]) {
+    tag_length = atoi(options[KMER_LENGTH].arg);
   }
 
   if (options[MAX_READS]) {
