@@ -390,7 +390,8 @@ int main (int argc, char *argv[]) {
     std::cout << "\tcounts";
   }
   std::cout << "\n";
-  char *tag_seq = new char[tag_length];
+  char *tag_seq = new char[tag_length+1];
+  tag_seq[tag_length] = '\0';
   for (it_counts=tags_counts.begin(); it_counts!=tags_counts.end(); ++it_counts) {
     intToDNA(it_counts->first,tag_length,tag_seq);
     std::cout << tag_seq;
