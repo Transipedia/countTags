@@ -34,3 +34,6 @@ produced separatly for each fastq file.
 For stranded fastq, you need to set the `--stranded` option. If you are using PE
 stranded FASTQ files, you need to manually reverse one of the pair according to
 the protocol orientation.
+
+Without this option, you will get either your tag sequence or the reverse-complement,
+which one come first by alphabetic order.
