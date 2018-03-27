@@ -8,8 +8,16 @@
 
 ## Usage
 
-First you need to create a FASTA file containing the tags you want to quantify.
-All tags must have the same length, and the maximum authorize lenght is 32bp.
+First you need to create a file containing the tags you want to quantify.
+You can use three tags format:
+ * fasta format
+ * separator format : sequence name (the separator can be a space or a tabulation)
+ * raw format : only the tag sequence
+You can provide the tags file via the standard input by using '-' as filename.
+
+All tags must have at least the K-mer length, if too short, tags are discarded.
+The maximum authorize tag length is 32bp.
+
 K-mer length must be provided to countTags using the `-k INT` option.
 
 For example :
