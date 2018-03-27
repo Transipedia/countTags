@@ -8,10 +8,10 @@ all: test_ok test_error_parsing
 test_ok:
 	# test with tag-names
 	for f in fas tsv csv; do ../bin/countTags --tag-names -k 30 $(okfile).$$f test_?.fastq.gz > $(ofile)_names_$${f}_ok.txt; done
-	for i in $(ofile)_names_*.txt; do diff $$i ok/$(ofile)_with_names_ok.txt;done
+	for i in $(ofile)_names_*.txt; do echo $$i; diff $$i ok/$(ofile)_with_names_ok.txt;done
 	# test without tag-names
 	for f in fas tsv csv raw; do ../bin/countTags -k 30 $(okfile).$$f test_?.fastq.gz > $(ofile)_without_$${f}_ok.txt; done
-	for i in $(ofile)_without_*.txt; do diff $$i ok/$(ofile)_without_names_ok.txt;done
+	for i in $(ofile)_without_*.txt; do echo $i; diff $$i ok/$(ofile)_without_names_ok.txt;done
 
 test_error_parsing:
 	../bin/countTags --tags_names --tag-format 2 -k 30 -m 10 $(okfile).raw test_?.fastq.gz
