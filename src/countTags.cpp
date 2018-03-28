@@ -234,7 +234,7 @@ int main (int argc, char *argv[]) {
     for (option::Option* opt = options[UNKNOWN]; opt; opt = opt->next())
         std::cout << "Unknown option: " << opt->name << "\n";
     option::printUsage(std::cout, usage);
-    return 0;
+    return 1;
   }
 
   if(parse.nonOptionsCount() < 2) {
