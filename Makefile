@@ -23,3 +23,9 @@ $(SRC_DIR)/%.o: $(SRC_DIR)/%.cpp
 $(BIN_DIR)/%: $(SRC_DIR)/%.cpp $(OBJECTS)
 	mkdir -p $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) $(LIBS) -o $@ $^
+
+test:
+	cd test && make test_ok
+
+test_init:
+	cd test && make init
