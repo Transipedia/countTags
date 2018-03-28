@@ -104,13 +104,6 @@ const option::Descriptor usage[] =
                        "========" },
   {TAG_FILE, 0, "i","",
     Arg::Required,     "  -i Tag_FileName      \ttag filename, or '-' for STDIN (MANDATORY)." },
-  {HELP,         0, "h", "help",
-    option::Arg::None, "  -h|--help  \tPrint usage and exit." },
-  {VERBOSE,      0, "v", "verbose",
-    option::Arg::None, "  -v|--verbose  \tPrint progress status on STDERR\n"
-                       "  -vvv          \tPrint debug informations on STDERR." },
-  {VERSION,      0, "V", "version",
-    option::Arg::None, "  -V|--version  \tPrint version and exit." },
   {KMER_LENGTH, 0, "k","",
     Arg::Numeric,      "  -k INT      \ttag length [default: 22]." },
   {MAX_READS,    0, "m", "",
@@ -125,6 +118,13 @@ const option::Descriptor usage[] =
     option::Arg::None, "  -t|--tag-names  \tprint tag names in the output." },
   {MERGE_COUNTS,    0,"" , "merge-counts",
     option::Arg::None, "  --merge-counts  \tmerge counts from all input FASTQs" },
+  {HELP,         0, "h", "help",
+    option::Arg::None, "  -h|--help  \tPrint usage and exit." },
+  {VERBOSE,      0, "v", "verbose",
+    option::Arg::None, "  -v|--verbose  \tPrint progress status on STDERR\n"
+                       "  -vvv          \tPrint debug informations on STDERR." },
+  {VERSION,      0, "V", "version",
+    option::Arg::None, "  -V|--version  \tPrint version and exit." },
   {UNKNOWN,      0, "" , "",
     option::Arg::None, "\nExamples:\n"
                        "=========\n"
@@ -409,6 +409,9 @@ int main (int argc, char *argv[]) {
     fclose(file);
     if (line)
       free(line);
+    if (verbose) {
+      std::cerr << (int)((double)line_id) + 1 << " total reads parsed" << std::endl;
+    }
   }
 
   /****
