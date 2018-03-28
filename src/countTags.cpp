@@ -199,6 +199,11 @@ int main (int argc, char *argv[]) {
   // integer size to use
   if (options[KMER_LENGTH]) {
     tag_length = atoi(options[KMER_LENGTH].arg);
+    if (tag_length > 32) {
+      std::cout << "ERROR: For now, K-mer length has to be < 32" << "\n\n";
+      option::printUsage(std::cout, usage);
+      return 1;
+    }
   }
 
   if (options[MAX_READS]) {
