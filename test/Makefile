@@ -30,8 +30,8 @@ init:
 	cat $(okfile).csv | sed 's/ /\t/' > $(okfile).tsv
 	cat $(okfile).tsv | while read tag count; do echo ">$$count\n$$tag"; done > $(okfile).fas
 	# Generate expected results
-	../attic/$(countTagsReference) --tag-names -k 30 -m 100000 $(okfile).fas test_?.fastq.gz > ok/$(ofile)_with_names_ok.txt
-	../attic/$(countTagsReference) -k 30 -m 100000 $(okfile).fas test_?.fastq.gz > ok/$(ofile)_without_names_ok.txt
+	../attic/$(countTagsReference) --tag-names -k 30 $(okfile).fas test_?.fastq.gz > ok/$(ofile)_with_names_ok.txt
+	../attic/$(countTagsReference) -k 30 $(okfile).fas test_?.fastq.gz > ok/$(ofile)_without_names_ok.txt
 
 	# Add shorter tags than 30; should not be analyse
 	tail -n +5 $(okfile).csv | head -4 | cut -c 1-15 | perl -p -e 'BEGIN {$$i=1};$$j=$$i++;s/\n/ shok.$$j\n/'>> $(okfile).csv
@@ -44,5 +44,5 @@ init:
 	# Create raw file format
 	cut -d ' ' -f1 $(okfile).csv > $(okfile).raw
 	# Generate expected results
-	#../attic/$(countTagsReference) --tag-names -k 30 -m 100000 $(okfile).fas test_?.fastq.gz > ok/$(ofile)_with_names_ok.txt
-	#../attic/$(countTagsReference) -k 30 -m 100000 $(okfile).fas test_?.fastq.gz > ok/$(ofile)_without_names_ok.txt
+	#../attic/$(countTagsReference) --tag-names -k 30 $(okfile).fas test_?.fastq.gz > ok/$(ofile)_with_names_ok.txt
+	#../attic/$(countTagsReference) -k 30 $(okfile).fas test_?.fastq.gz > ok/$(ofile)_without_names_ok.txt
