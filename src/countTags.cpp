@@ -1,8 +1,6 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
-#include <boost/iostreams/filtering_stream.hpp>
-#include <boost/iostreams/filter/gzip.hpp>
 #include <iterator>
 #include <string.h>
 #include <cstdint>
@@ -348,49 +346,42 @@ int main (int argc, char *argv[]) {
     len = 0;
     line_id = 0;
     tmp = "";
-//    file = popen(tmp.append(gzip_pipe).append(parse.nonOption(s)).c_str(),"r");
+    file = popen(tmp.append(gzip_pipe).append(parse.nonOption(s)).c_str(),"r");
     nb_factors = 0;
 
-    std::ifstream filein(parse.nonOption(s), std::ios_base::in | std::ios_base::binary);
-    try {
-        boost::iostreams::filtering_istream in;
-        in.push(boost::iostreams::gzip_decompressor());
-        in.push(filein);
-        for(std::string seq; std::getline(in, seq); )
-        {
-            // If this line is a sequence
-            if(line_id % 4 == 1) {
-              read_id = ((int)((double)line_id*0.25) + 1);
-              if(read_id >= max_reads) {
-                break;
-              }
-              // Print a user-friendly output on STDERR every each XXXX reads processed
-              if (verbose && read_id % MILLION == 0) {
-                std::cerr << (int)((double)line_id*0.25) + 1 << " reads parsed" << std::endl;
-              }
-
-              // Skip the sequence if the read length is < to the tag_length
-              if(seq.length() < tag_length)
-                continue;
-
-              nb_tags = seq.length() - tag_length + 1;
-              nb_factors += nb_tags;
-
-              //uint64_t valrev,valfwd;
-              last = -3;
-
-              for(i = 0; i < nb_tags; i++) {
-                it_counts = tags_counts.find(valns(i,(char *)seq.c_str(),tag_length,&last,&valfwd,&valrev,stranded));
-                if(it_counts != tags_counts.end()) {
-                  it_counts->second[s]++;
-                }
-              }
-            }
-            line_id++;
+    while ((read = getline(&line, &len, file)) != -1) {
+      // If this line is a sequence
+      if(line_id % 4 == 1) {
+        read_id = ((int)((double)line_id*0.25) + 1);
+        if(read_id >= max_reads) {
+          break;
         }
-    }
-    catch(const boost::iostreams::gzip_error& e) {
-         std::cout << e.what() << '\n';
+        // Print a user-friendly output on STDERR every each XXXX reads processed
+        if (verbose && read_id % MILLION == 0) {
+          std::cerr << (int)((double)line_id*0.25) + 1 << " reads parsed" << std::endl;
+        }
+        // set seq to line
+        seq = line;
+        seq_length = strlen(seq) - 1; // Minus 1 because we have a new line
+
+        // Skip the sequence if the read length is < to the tag_length
+        if(seq_length < tag_length)
+          continue;
+
+        nb_tags = seq_length - tag_length + 1;
+        nb_factors += nb_tags;
+
+        //uint64_t valrev,valfwd;
+        last = -3;
+
+        for(i = 0; i < nb_tags; i++) {
+          it_counts = tags_counts.find(valns(i,seq,tag_length,&last,&valfwd,&valrev,stranded));
+          if(it_counts != tags_counts.end()) {
+            it_counts->second[s]++;
+          }
+        }
+      }
+      line_id++;
     }
 
     nb_factors_by_sample.push_back(nb_factors);

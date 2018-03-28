@@ -1,7 +1,6 @@
 SHELL=bash
 CXX = g++
 CXXFLAGS = -O4 -std=c++11
-LIBS = -l boost_iostreams
 SRC_DIR = src
 BIN_DIR	= bin
 OBJ_FILES = CountsTable.cpp
@@ -29,3 +28,4 @@ test:
 
 test_init:
 	cd test && make init
+	$(CXX) $(CXXFLAGS) -o $@ $^
