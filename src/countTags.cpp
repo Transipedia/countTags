@@ -71,6 +71,14 @@ struct Arg: public option::Arg
     fprintf(stderr, "%s", msg2);
   }
 
+  static option::ArgStatus Required(const option::Option& option, bool msg)
+  {
+    if (option.arg != 0)
+      return option::ARG_OK;
+    if (msg) printError("Option '", option, "' requires an argument\n");
+    return option::ARG_ILLEGAL;
+  }
+
   static option::ArgStatus Numeric(const option::Option& option, bool msg)
   {
     char* endptr = 0;
@@ -83,17 +91,19 @@ struct Arg: public option::Arg
   }
 };
 
-enum  optionIndex {UNKNOWN,HELP,VERBOSE,VERSION,KMER_LENGTH,STRANDED,MAX_READS,NB_THREADS,NORMALIZE,TAG_NAMES,MERGE_COUNTS};
+enum  optionIndex {UNKNOWN,HELP,VERBOSE,VERSION,KMER_LENGTH,TAG_FILE,STRANDED,MAX_READS,NB_THREADS,NORMALIZE,TAG_NAMES,MERGE_COUNTS};
 const option::Descriptor usage[] =
 {
   {UNKNOWN,      0, "" , "",
     option::Arg::None, "The purpose of countTags is to count occurences of few tags in large set of fastq files.\n\n"
-                       "USAGE: countTags [options] tags.file seq.fastq[.gz]\n"
+                       "USAGE: countTags [options] -i tags.file seq.fastq[.gz]\n"
                        "======\n"
                        " * Tags file format: fasta, tsv (tag[ \\t]name) or raw (tag)\n"
                        " * Use '-' for reading tags from STDIN\n"
                        "\nOptions:\n"
                        "========" },
+  {TAG_FILE, 0, "i","",
+    Arg::Required,     "  -i Tag_FileName      \ttag filename, or '-' for STDIN (MANDATORY)." },
   {HELP,         0, "h", "help",
     option::Arg::None, "  -h|--help  \tPrint usage and exit." },
   {VERBOSE,      0, "v", "verbose",
@@ -237,13 +247,19 @@ int main (int argc, char *argv[]) {
     return 1;
   }
 
-  if(parse.nonOptionsCount() < 2) {
+  if(parse.nonOptionsCount() < 1) {
     option::printUsage(std::cout, usage);
     return 0;
   }
 
-  tags_file = parse.nonOption(0);
-  nb_samples = parse.nonOptionsCount() - 1;
+  tags_file = options[TAG_FILE].arg;
+  nb_samples = parse.nonOptionsCount();
+
+  if (verbose>2) {
+    std::cout << "File to analyse: " << std::to_string(parse.nonOptionsCount()) << std::endl;
+    for (int i = 0; i < parse.nonOptionsCount(); ++i)
+      fprintf(stdout, "Non-option argument #%d is %s\n", i, parse.nonOption(i));
+  }
 
   /**********************************
    *
@@ -321,16 +337,16 @@ int main (int argc, char *argv[]) {
 //#pragma omp parallel num_threads(nb_threads)
   for (int s = 0; s < nb_samples; ++s) {
     if (verbose)
-       std::cerr << "Counting tags for file: " << parse.nonOption(s+1) << "\n";
+       std::cerr << "Counting tags for file: " << parse.nonOption(s) << "\n";
 
     line = NULL;
     len = 0;
     line_id = 0;
     tmp = "";
-    file = popen(tmp.append(gzip_pipe).append(parse.nonOption(s+1)).c_str(),"r");
+//    file = popen(tmp.append(gzip_pipe).append(parse.nonOption(s)).c_str(),"r");
     nb_factors = 0;
 
-    std::ifstream filein(parse.nonOption(s+1), std::ios_base::in | std::ios_base::binary);
+    std::ifstream filein(parse.nonOption(s), std::ios_base::in | std::ios_base::binary);
     try {
         boost::iostreams::filtering_istream in;
         in.push(boost::iostreams::gzip_decompressor());
@@ -401,7 +417,7 @@ int main (int argc, char *argv[]) {
     std::cout << "\ttag_names";
   if(!merge_counts) {
     for (int s = 0; s < nb_samples; ++s) {
-      std::cout << "\t" << parse.nonOption(s+1);
+      std::cout << "\t" << parse.nonOption(s);
     }
   } else {
     std::cout << "\tcounts";

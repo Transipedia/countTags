@@ -4,10 +4,10 @@ all: test_ok test_error_parsing
 
 test_ok:
 	# test with tag-names
-	for f in fas tsv csv; do ../bin/countTags --tag-names -k 30 $(okfile).$$f test_?.fastq.gz > $(ofile)_names_$${f}_ok.txt; done
+	for f in fas tsv csv; do ../bin/countTags --tag-names -k 30 -i $(okfile).$$f test_?.fastq.gz > $(ofile)_names_$${f}_ok.txt; done
 	for i in $(ofile)_names_*.txt; do echo $$i; diff $$i ok/$(ofile)_with_names_ok.txt;done
 	# test without tag-names
-	for f in fas tsv csv raw; do ../bin/countTags -k 30 $(okfile).$$f test_?.fastq.gz > $(ofile)_without_$${f}_ok.txt; done
+	for f in fas tsv csv raw; do ../bin/countTags -k 30 -i $(okfile).$$f test_?.fastq.gz > $(ofile)_without_$${f}_ok.txt; done
 	for i in $(ofile)_without_*.txt; do echo $i; diff $$i ok/$(ofile)_without_names_ok.txt;done
 
 test_error_parsing:
