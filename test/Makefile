@@ -1,8 +1,4 @@
-ofile=output_test
-jf=/tmp/test_jellyfish_count.jf
-jfcount=/tmp/jfcount.txt
-okfile=TAGS_test
-countTagsReference=countTags-v0.2
+include Makefile.ref
 
 all: test_ok test_error_parsing
 
