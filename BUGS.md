@@ -10,3 +10,6 @@
  * Problem probably with storrage UINT32, as pointed by JA
 
 # [ ] 20180326-01 : Do not test if there is a tags file, always take first argument as tag file
+ * Solution: put the tag filename as argument with option '-i'
+ * Not Working as expected: the Arg::Required is not working
+ * So for now, test with a 'if' condition, in main code.

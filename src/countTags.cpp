@@ -191,6 +191,11 @@ int main (int argc, char *argv[]) {
   if (parse.error())
     return 1;
 
+  if (!options[TAG_FILE]) {
+    std::cerr << "ERROR : -i tag_file required\n";
+    option::printUsage(std::cout, usage);
+    return 1;
+  }
   if (options[HELP] || argc == 0) {
     option::printUsage(std::cout, usage);
     return 0;
