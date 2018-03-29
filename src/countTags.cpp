@@ -313,8 +313,10 @@ int main (int argc, char *argv[]) {
       if (no_name)
         tag_name = std::to_string(nb_tags+1);
       // Take at least tag_length for each tags
-      if (lines.length() < tag_length)
+      if (lines.length() < tag_length) {
+        std::cerr << "Error: tag lower than kmer: " << lines << std::endl;
         continue;
+      }
       // convert tag to Int
       tag = DNAtoInt(lines.c_str(),tag_length,stranded);
       if (verbose>2)
