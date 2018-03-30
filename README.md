@@ -13,7 +13,9 @@ You can use three tags format:
  * fasta format
  * separator format : sequence name (the separator can be a space or a tabulation)
  * raw format : only the tag sequence
-You can provide the tags file via the standard input by using '-' as filename.
+
+Use option '-i' to specify the tag file
+You can provide the tags file via the standard input by using '-i -' as filename.
 
 All tags must have at least the K-mer length, if too short, tags are discarded.
 The maximum authorize tag length is 32bp.

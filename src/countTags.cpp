@@ -68,15 +68,13 @@ struct Arg: public option::Arg
     fwrite(opt.name, opt.namelen, 1, stderr);
     fprintf(stderr, "%s", msg2);
   }
-
-  static option::ArgStatus Required(const option::Option& option, bool msg)
+  static option::ArgStatus NonEmpty(const option::Option& option, bool msg)
   {
-    if (option.arg != 0)
+    if (option.arg != 0 && option.arg[0] != 0)
       return option::ARG_OK;
-    if (msg) printError("Option '", option, "' requires an argument\n");
+    if (msg) printError("Option '", option, "' requires a non-empty argument\n");
     return option::ARG_ILLEGAL;
   }
-
   static option::ArgStatus Numeric(const option::Option& option, bool msg)
   {
     char* endptr = 0;
@@ -101,7 +99,7 @@ const option::Descriptor usage[] =
                        "\nOptions:\n"
                        "========" },
   {TAG_FILE, 0, "i","",
-    Arg::Required,     "  -i Tag_FileName      \ttag filename, or '-' for STDIN (MANDATORY)." },
+    Arg::NonEmpty,     "  -i Tag_FileName      \ttag filename, or '-' for STDIN (MANDATORY)." },
   {KMER_LENGTH, 0, "k","",
     Arg::Numeric,      "  -k INT      \ttag length [default: 22]." },
   {MAX_READS,    0, "m", "",
@@ -189,11 +187,6 @@ int main (int argc, char *argv[]) {
   if (parse.error())
     return 1;
 
-  if (!options[TAG_FILE]) {
-    std::cerr << "ERROR : -i tag_file required\n";
-    option::printUsage(std::cout, usage);
-    return 1;
-  }
   if (options[HELP] || argc == 0) {
     option::printUsage(std::cout, usage);
     return 0;
@@ -206,6 +199,15 @@ int main (int argc, char *argv[]) {
 
   if (options[VERBOSE]) {
     verbose = options[VERBOSE].count();
+  }
+
+  // Test if we have a file in input
+  // Not using Arg::Required from option parser, because
+  // is not working with option -V -h
+  if (!options[TAG_FILE].count()) {
+    std::cerr << "ERROR : -i tag_file required\n\n";
+    option::printUsage(std::cout, usage);
+    return 1;
   }
 
   // TODO we should check the length to choose the appropriate

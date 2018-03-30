@@ -1,4 +1,4 @@
-# [ ] 20180329-01 : When asking for -h -V, got error for nothing with -i
+# [X] 20180329-01 : When asking for -h -V, got error for nothing with -i
  * due to Bug #20180326-01.
 
 # [ ] 20180328-01 : Do not Test if fastq.gz files are present
@@ -12,7 +12,7 @@
  * at this time add a message and exit if kmer > 32
  * Problem probably with storrage UINT32, as pointed by JA
 
-# [-] 20180326-01 : Do not test if there is a tags file, always take first argument as tag file
+# [X] 20180326-01 : Do not test if there is a tags file, always take first argument as tag file
  * Solution: put the tag filename as argument with option '-i'
  * Not Working as expected: the Arg::Required is not working
  * So for now, test with a 'if' condition, in main code.
