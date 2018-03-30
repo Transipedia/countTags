@@ -342,15 +342,15 @@ int main (int argc, char *argv[]) {
    *
    *********************************/
 //#pragma omp parallel num_threads(nb_threads)
-  for (int s = 0; s < nb_samples; ++s) {
+  for (int sample = 0; sample < nb_samples; ++sample) {
     if (verbose)
-       std::cerr << "Counting tags for file: " << parse.nonOption(s) << "\n";
+       std::cerr << "Counting tags for file: " << parse.nonOption(sample) << "\n";
 
     line = NULL;
     len = 0;
     line_id = 0;
     tmp = "";
-    file = popen(tmp.append(gzip_pipe).append(parse.nonOption(s)).c_str(),"r");
+    file = popen(tmp.append(gzip_pipe).append(parse.nonOption(sample)).c_str(),"r");
     nb_factors = 0;
 
     while ((read = getline(&line, &len, file)) != -1) {
@@ -381,7 +381,7 @@ int main (int argc, char *argv[]) {
         for(i = 0; i < nb_tags; i++) {
           it_counts = tags_counts.find(valns(i,seq,tag_length,&last,&valfwd,&valrev,stranded));
           if(it_counts != tags_counts.end()) {
-            it_counts->second[s]++;
+            it_counts->second[sample]++;
           }
         }
       }
@@ -395,8 +395,8 @@ int main (int argc, char *argv[]) {
         std::cerr << "Normalize counts" << std::endl;
       for (it_counts=tags_counts.begin(); it_counts!=tags_counts.end(); ++it_counts) {
         // TODO We should take into accout the error rate...
-        if(it_counts->second[s] > 0)
-          it_counts->second[s] = it_counts->second[s] * MILLION / nb_factors;
+        if(it_counts->second[sample] > 0)
+          it_counts->second[sample] = it_counts->second[sample] * MILLION / nb_factors;
       }
     }
 
@@ -419,8 +419,8 @@ int main (int argc, char *argv[]) {
   if (print_tag_names)
     std::cout << "\ttag_names";
   if(!merge_counts) {
-    for (int s = 0; s < nb_samples; ++s) {
-      std::cout << "\t" << parse.nonOption(s);
+    for (int sample = 0; sample < nb_samples; ++sample) {
+      std::cout << "\t" << parse.nonOption(sample);
     }
   } else {
     std::cout << "\tcounts";
@@ -435,13 +435,13 @@ int main (int argc, char *argv[]) {
       std::cout << "\t" << join(tags_names[it_counts->first],",");
     }
     if(!merge_counts){
-      for (int s = 0; s < nb_samples; ++s) {
-        std::cout << "\t" << it_counts->second[s];
+      for (int sample = 0; sample < nb_samples; ++sample) {
+        std::cout << "\t" << it_counts->second[sample];
       }
     } else {
       double count_sum = 0;
-      for (int s = 0; s < nb_samples; ++s) {
-        count_sum += it_counts->second[s];
+      for (int sample = 0; sample < nb_samples; ++sample) {
+        count_sum += it_counts->second[sample];
       }
       std::cout << "\t" << count_sum;
     }
@@ -452,13 +452,13 @@ int main (int argc, char *argv[]) {
   if (print_tag_names)
     std::cout << "\t*";
   if(!merge_counts) {
-    for (int s = 0; s < nb_samples; ++s) {
-      std::cout << "\t" << nb_factors_by_sample[s];
+    for (int sample = 0; sample < nb_samples; ++sample) {
+      std::cout << "\t" << nb_factors_by_sample[sample];
     }
   } else {
     uint64_t nb_factors_sum = 0;
-    for (int s = 0; s < nb_samples; ++s) {
-      nb_factors_sum += nb_factors_by_sample[s];
+    for (int sample = 0; sample < nb_samples; ++sample) {
+      nb_factors_sum += nb_factors_by_sample[sample];
     }
     std::cout << "\t" << nb_factors_sum;
   }
