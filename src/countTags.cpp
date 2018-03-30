@@ -16,7 +16,7 @@
 //#include <zlib.h>
 
 #define MILLION 1000000
-#define VERS "0.3.1"
+#define VERS "0.3.2"
 
 //return the minumum value of the k-mer at pos p between strand rev and stran fwd
 //TODO add a function that get a DNA string and a k value, and return a array of vector values
@@ -87,7 +87,7 @@ struct Arg: public option::Arg
   }
 };
 
-enum  optionIndex {UNKNOWN,HELP,VERBOSE,VERSION,KMER_LENGTH,TAG_FILE,STRANDED,MAX_READS,NB_THREADS,NORMALIZE,TAG_NAMES,MERGE_COUNTS};
+enum  optionIndex {UNKNOWN,HELP,VERBOSE,VERSION,KMER_LENGTH,TAG_FILE,READ_FILE,STRANDED,MAX_READS,NB_THREADS,NORMALIZE,TAG_NAMES,MERGE_COUNTS};
 const option::Descriptor usage[] =
 {
   {UNKNOWN,      0, "" , "",
@@ -114,6 +114,8 @@ const option::Descriptor usage[] =
     option::Arg::None, "  -t|--tag-names  \tprint tag names in the output." },
   {MERGE_COUNTS,    0,"" , "merge-counts",
     option::Arg::None, "  --merge-counts  \tmerge counts from all input FASTQs" },
+  {READ_FILE, 0, "r","readsmatching",
+    Arg::NonEmpty,     "  -r fileName      \tfilename for reads mathing kmer." },
   {HELP,         0, "h", "help",
     option::Arg::None, "  -h|--help  \tPrint usage and exit." },
   {VERBOSE,      0, "v", "verbose",
@@ -153,6 +155,7 @@ int main (int argc, char *argv[]) {
 
   char * seq;
   std::string tag_name;
+  std::string output_read; // store filename to output read matching kmer
   uint32_t seq_length;
   uint64_t tag;
   uint64_t valrev,valfwd;
@@ -243,6 +246,10 @@ int main (int argc, char *argv[]) {
 
   if (options[MERGE_COUNTS]) {
     merge_counts = true;
+  }
+
+  if (options[READ_FILE].count()) {
+    output_read = options[READ_FILE].arg;
   }
 
   if (options[UNKNOWN]) {
@@ -341,6 +348,18 @@ int main (int argc, char *argv[]) {
    *            First pass
    *
    *********************************/
+
+  // open file tp output reads matching kmer
+  std::ofstream hfile_read;
+  if (output_read.length()) {
+    hfile_read.open(output_read, std::ifstream::out);
+    // check if not write error
+    if (hfile_read.fail()) {
+      std::cerr << "Error: Can't write to read file "<< output_read << std::endl;
+      return 1;
+    }
+  }
+
 //#pragma omp parallel num_threads(nb_threads)
   for (int sample = 0; sample < nb_samples; ++sample) {
     if (verbose)
@@ -382,6 +401,17 @@ int main (int argc, char *argv[]) {
           it_counts = tags_counts.find(valns(i,seq,tag_length,&last,&valfwd,&valrev,stranded));
           if(it_counts != tags_counts.end()) {
             it_counts->second[sample]++;
+            // output read in a file if required
+            if (output_read.length()) {
+              char *tag_seq = new char[tag_length+1];
+              tag_seq[tag_length] = '\0';
+                intToDNA(it_counts->first,tag_length,tag_seq);
+                hfile_read << tag_seq;
+                if(print_tag_names) {
+                  hfile_read << "\t" << join(tags_names[it_counts->first],",");
+                }
+              hfile_read << "\t" << parse.nonOption(sample) << "\t" << seq;
+            }
           }
         }
       }
