@@ -24,7 +24,7 @@ $(BIN_DIR)/%: $(SRC_DIR)/%.cpp $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $(LIBS) -o $@ $^
 
 test:
-	cd test && make test_ok
+	cd test && make all
 
 test_init:
 	cd test && make init
