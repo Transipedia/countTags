@@ -29,3 +29,5 @@ test:
 test_init:
 	cd test && make init
 	$(CXX) $(CXXFLAGS) -o $@ $^
+
+.PHONY: test
