@@ -4,7 +4,8 @@
 # [X] 20180329-01 : When asking for -h -V, got error for nothing with -i
  * due to Bug #20180326-01 (commit 451314ffc4a).
 
-# [ ] 20180328-01 : Do not Test if fastq.gz files are present
+# [X] 20180328-01 : Do not Test if fastq.gz files are present
+ * done in commit 63b14cd3eb.
 
 # [ ] 20180328-02 : Get the shorter alphabetic tag in the output
  * Solution 1:
