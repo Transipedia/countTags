@@ -5,11 +5,11 @@ all: test_ok test_error_parsing
 test_ok:
 	@echo "$(RED)Test everything is fine:$(NoColor)"
 	@echo "$(PURPLE)# test with tag-names$(NoColor)"
-	for f in fas tsv csv; do ../bin/countTags --tag-names -k 30 -i $(okfile).$$f test_?.fastq.gz > $(ofile)_names_$${f}_ok.txt; done
-	for i in $(ofile)_names_*.txt; do echo "$(GREEN)$$i$(NoColor)"; diff $$i ok/$(ofile)_with_names_ok.txt;done
+	for f in fas tsv csv; do ../bin/countTags --tag-names -k 30 -i $(okfile).$$f test_?.fastq.gz > /tmp/$(ofile)_names_$${f}_ok.txt; done
+	for i in /tmp/$(ofile)_names_*_ok.txt; do echo "$(GREEN)$$i$(NoColor)"; diff $$i ok/$(ofile)_with_names_ok.txt;done
 	@echo "$(PURPLE)# test without tag-names$(NoColor)"
-	for f in fas tsv csv raw; do ../bin/countTags -k 30 -i $(okfile).$$f test_?.fastq.gz > $(ofile)_without_$${f}_ok.txt; done
-	for i in $(ofile)_without_*.txt; do echo $i; diff $$i ok/$(ofile)_without_names_ok.txt;done
+	for f in fas tsv csv raw; do ../bin/countTags -k 30 -i $(okfile).$$f test_?.fastq.gz > /tmp/$(ofile)_without_$${f}_ok.txt; done
+	for i in /tmp/$(ofile)_without_*.txt; do echo $i; diff $$i ok/$(ofile)_without_names_ok.txt;done
 
 test_error_parsing:
 	@echo "$(RED)Test error in parsing argument:$(NoColor)"
