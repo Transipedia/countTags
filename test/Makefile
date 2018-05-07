@@ -1,6 +1,6 @@
 include Makefile.ref
 
-all: test_ok test_error_parsing
+all: test_ok test_error_parsing test_stranded
 
 test_ok:
 	@echo "$(RED)Test everything is fine:$(NoColor)"
@@ -15,6 +15,10 @@ test_error_parsing:
 	@echo "$(RED)Test error in parsing argument:$(NoColor)"
 	../bin/countTags --tags_names --tag-format 2 -k 30 -m 10 $(okfile).raw test_?.fastq.gz
 
+test_stranded:
+	@echo "$(RED)Test with stranded option:$(NoColor)"
+	for f in fas tsv csv; do ../bin/countTags --tag-names -k 30 --stranded -i $(okfile).$$f test_?.fastq.gz > /tmp/$(ofile)_names_$${f}_okstranded.txt; done
+	for i in /tmp/$(ofile)_names_*_okstranded.txt; do echo "$(GREEN)$$i$(NoColor)"; diff $$i stranded/$(ofile)_with_names_ok.txt;done
 
 init:
 	rm -f $(okfile).*
