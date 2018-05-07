@@ -431,7 +431,7 @@ int main (int argc, char *argv[]) {
     }
 
     // Close file and clear line buffer
-    fclose(file);
+    pclose(file);
     if (line)
       free(line);
     if (verbose) {
