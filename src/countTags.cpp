@@ -369,6 +369,14 @@ int main (int argc, char *argv[]) {
     len = 0;
     line_id = 0;
     tmp = "";
+    // Test if fastq file is present, otherwise exit with error 10
+    std::ifstream testfile(parse.nonOption(sample));
+    if (!testfile.good()) {
+      std::cerr << "Error: Can't read fastq file " << parse.nonOption(sample) << std::endl;
+      return 10;
+    }
+
+    // open file via pipe, so using another thread to gunzip the file
     file = popen(tmp.append(gzip_pipe).append(parse.nonOption(sample)).c_str(),"r");
     nb_factors = 0;
 
