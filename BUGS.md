@@ -1,3 +1,6 @@
+# [ ] 20180508-01 : Do not stop if no tag given
+ * Add a test to exit if no tag given in tag file or stdin
+
 # [X] 20180329-02 : No information is output when tag are drop because they are shorter than kmer
  * Output on sdterr, tag shorter than kmer (commit 67546ef9d1ccf).
 

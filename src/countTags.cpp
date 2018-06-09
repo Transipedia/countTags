@@ -339,6 +339,12 @@ int main (int argc, char *argv[]) {
     line_id++;
   }
 
+  // Bug: didn't test if tag file is empty
+  if (line_id == 0) {
+    std::cerr << "Did not get or understand you tag sequences" << std::endl;
+    exit(2);
+  }
+
    if (verbose)
      std::cerr << "Finished indexing tags" << std::endl;
 
