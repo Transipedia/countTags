@@ -1,6 +1,9 @@
 # [X] 20180508-01 : Do not stop if no tag given
  * Add a test to exit if no tag given in tag file or stdin (commit 5dd253e)
 
+# [X] 20180508-02 : Try to open stdin if tag filename is oneletter
+ * Test filename is '-' if stdin, and not filename size =1
+
 # [X] 20180329-02 : No information is output when tag are drop because they are shorter than kmer
  * Output on sdterr, tag shorter than kmer (commit 67546ef9d1ccf).
 

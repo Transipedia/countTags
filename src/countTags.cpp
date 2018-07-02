@@ -288,7 +288,7 @@ int main (int argc, char *argv[]) {
 
   std::istream *filein;
   std::ifstream fileif;
-  if (strlen(tags_file) == 1) {
+  if (*tags_file[0] == '-') {
     // use stdin
     filein = &std::cin;
   } else {
