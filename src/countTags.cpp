@@ -341,7 +341,7 @@ int main (int argc, char *argv[]) {
 
   // Bug: didn't test if tag file is empty
   if (line_id == 0) {
-    std::cerr << "Did not get or understand you tag sequences" << std::endl;
+    std::cerr << "I did not get or understand your tag sequences" << std::endl;
     exit(2);
   }
 
