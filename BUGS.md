@@ -16,7 +16,7 @@
 # [X] 20180328-01 : Do not Test if fastq.gz files are present
  * done in commit 63b14cd3eb.
 
-# [ ] 20180328-02 : Get the shorter alphabetic tag in the output
+# [ ] 20180328-02 : Output the original sequence and not the shorter alphabetic tag
  * Solution 1:
     - use 1 bit to store if the tag is forward or reverse-complement
     - but only 31 bits for the tag.
