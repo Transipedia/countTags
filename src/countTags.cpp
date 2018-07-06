@@ -128,8 +128,8 @@ const option::Descriptor usage[] =
   {UNKNOWN,      0, "" , "",
     option::Arg::None, "\nExamples:\n"
                        "=========\n"
-                       " * countTags -k 30 --stranded -t MyBestTags.tsv MyAllFastq*.gz > MyCount.tsv\n"
-                       " * countTags -k 30 -t - MyAllFastq*.gz < MyBestTags.raw\n" },
+                       " * countTags -k 30 --stranded -t -i MyBestTags.tsv MyAllFastq*.gz > MyCount.tsv\n"
+                       " * countTags -k 30 -t -i - MyAllFastq*.gz < MyBestTags.raw\n" },
   {0,0,0,0,0,0}
 };
 
