@@ -6,7 +6,7 @@
 *                           Médicale)                                          *
 *                                                                              *
 *  Copyright (C) 2015-2018  Jérôme Audoux                                      *
-*  Copyright (C) 2018       Anthony Boureux                                    *
+*  Copyright (C) 2018-      Anthony Boureux                                    *
 *                                                                              *
 *                                                                              *
 *  This file is part of countTags program.                                     *
