@@ -16,7 +16,7 @@
 //#include <zlib.h>
 
 #define MILLION 1000000
-#define VERS "0.3.3"
+#define VERS "0.3.4"
 
 //return the minumum value of the k-mer at pos p between strand rev and stran fwd
 //TODO add a function that get a DNA string and a k value, and return a array of vector values
@@ -87,7 +87,7 @@ struct Arg: public option::Arg
   }
 };
 
-enum  optionIndex {UNKNOWN,HELP,VERBOSE,VERSION,KMER_LENGTH,TAG_FILE,READ_FILE,STRANDED,MAX_READS,NB_THREADS,NORMALIZE,TAG_NAMES,MERGE_COUNTS};
+enum  optionIndex {UNKNOWN,HELP,VERBOSE,VERSION,KMER_LENGTH,TAG_FILE,READ_FILE,STRANDED,MAX_READS,NB_THREADS,NORMALIZE,TAG_NAMES,MERGE_COUNTS,MERGE_COUNTS_COLNAME};
 const option::Descriptor usage[] =
 {
   {UNKNOWN,      0, "" , "",
@@ -114,6 +114,8 @@ const option::Descriptor usage[] =
     option::Arg::None, "  -t|--tag-names  \tprint tag names in the output." },
   {MERGE_COUNTS,    0,"" , "merge-counts",
     option::Arg::None, "  --merge-counts  \tmerge counts from all input FASTQs" },
+  {MERGE_COUNTS_COLNAME,    0,"" , "merge-counts-colname",
+    Arg::NonEmpty, "  --merge-counts-colname  \tcolumn name when merge counts is used" },
   {READ_FILE, 0, "r","reads",
     Arg::NonEmpty,     "  -r|--reads fileName      \twrite reads matching kmer in fileName." },
   {HELP,         0, "h", "help",
@@ -126,8 +128,8 @@ const option::Descriptor usage[] =
   {UNKNOWN,      0, "" , "",
     option::Arg::None, "\nExamples:\n"
                        "=========\n"
-                       " * countTags -k 30 --stranded -t MyBestTags.tsv MyAllFastq*.gz > MyCount.tsv\n"
-                       " * countTags -k 30 -t - MyAllFastq*.gz < MyBestTags.raw\n" },
+                       " * countTags -k 30 --stranded -t -i MyBestTags.tsv MyAllFastq*.gz > MyCount.tsv\n"
+                       " * countTags -k 30 -t -i - MyAllFastq*.gz < MyBestTags.raw\n" },
   {0,0,0,0,0,0}
 };
 
@@ -146,6 +148,7 @@ int main (int argc, char *argv[]) {
   bool normalize = false;
   bool print_tag_names = false;
   bool merge_counts = false;
+  std::string merge_counts_colname = "counts";
   uint32_t nb_tags = 0;
   uint32_t max_reads = UINT32_MAX;
   int nb_threads = 1;
@@ -246,6 +249,10 @@ int main (int argc, char *argv[]) {
 
   if (options[MERGE_COUNTS]) {
     merge_counts = true;
+    if (options[MERGE_COUNTS_COLNAME]) {
+      std::cerr << "error:" << options[MERGE_COUNTS_COLNAME].arg << "\n";
+      merge_counts_colname = options[MERGE_COUNTS_COLNAME].arg;
+    }
   }
 
   if (options[READ_FILE].count()) {
@@ -288,7 +295,7 @@ int main (int argc, char *argv[]) {
 
   std::istream *filein;
   std::ifstream fileif;
-  if (strlen(tags_file) == 1) {
+  if (*tags_file == '-') {
     // use stdin
     filein = &std::cin;
   } else {
@@ -337,6 +344,12 @@ int main (int argc, char *argv[]) {
        std::cerr << ", nb_tag: " << nb_tags << std::endl;
     }
     line_id++;
+  }
+
+  // Bug: didn't test if tag file is empty
+  if (line_id == 0) {
+    std::cerr << "I did not get or understand your tag sequences" << std::endl;
+    exit(2);
   }
 
    if (verbose)
@@ -461,7 +474,7 @@ int main (int argc, char *argv[]) {
       std::cout << "\t" << parse.nonOption(sample);
     }
   } else {
-    std::cout << "\tcounts";
+    std::cout << "\t" << merge_counts_colname;
   }
   std::cout << "\n";
   char *tag_seq = new char[tag_length+1];
