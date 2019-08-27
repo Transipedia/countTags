@@ -119,7 +119,7 @@ struct Arg: public option::Arg
   }
 };
 
-enum  optionIndex {UNKNOWN,HELP,VERBOSE,VERSION,KMER_LENGTH,TAG_FILE,READ_FILE,STRANDED,MAX_READS,NB_THREADS,NORMALIZE,TAG_NAMES,MERGE_COUNTS,MERGE_COUNTS_COLNAME};
+enum  optionIndex {UNKNOWN,HELP,VERBOSE,VERSION,KMER_LENGTH,TAG_FILE,READS_WRFILE,STRANDED,MAX_READS,NB_THREADS,NORMALIZE,TAG_NAMES,MERGE_COUNTS,MERGE_COUNTS_COLNAME};
 const option::Descriptor usage[] =
 {
   {UNKNOWN,      0, "" , "",
@@ -148,7 +148,7 @@ const option::Descriptor usage[] =
     option::Arg::None, "  --merge-counts  \tmerge counts from all input FASTQs" },
   {MERGE_COUNTS_COLNAME,    0,"" , "merge-counts-colname",
     Arg::NonEmpty, "  --merge-counts-colname  \tcolumn name when merge counts is used" },
-  {READ_FILE, 0, "r","reads",
+  {READS_WRFILE, 0, "r","reads",
     Arg::NonEmpty,     "  -r|--reads fileName      \twrite reads matching kmer in fileName." },
   {HELP,         0, "h", "help",
     option::Arg::None, "  -h|--help  \tPrint usage and exit." },
@@ -289,8 +289,8 @@ int main (int argc, char *argv[]) {
     }
   }
 
-  if (options[READ_FILE].count()) {
-    output_read = options[READ_FILE].arg;
+  if (options[READS_WRFILE].count()) {
+    output_read = options[READS_WRFILE].arg;
   }
 
   if (options[UNKNOWN]) {
@@ -342,6 +342,7 @@ int main (int argc, char *argv[]) {
     filein = &fileif;
   }
   bool no_name = 1;
+
   // Parse file and detect file format (fas, raw or tsv)
   for (std::string lines; std::getline(*filein, lines); ) {
     if (lines.find(">") != std::string::npos) {
