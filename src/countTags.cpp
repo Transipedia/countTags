@@ -282,7 +282,9 @@ int main (int argc, char *argv[]) {
   if (options[MERGE_COUNTS]) {
     merge_counts = true;
     if (options[MERGE_COUNTS_COLNAME]) {
-      std::cerr << "error:" << options[MERGE_COUNTS_COLNAME].arg << "\n";
+      if (verbose) {
+        std::cerr << "\tColumn name when merging:" << options[MERGE_COUNTS_COLNAME].arg << "\n";
+      }
       merge_counts_colname = options[MERGE_COUNTS_COLNAME].arg;
     }
   }
