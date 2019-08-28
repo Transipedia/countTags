@@ -301,7 +301,7 @@ int main (int argc, char *argv[]) {
   if (options[MERGE_COUNTS]) {
     merge_counts = true;
     if (options[MERGE_COUNTS_COLNAME]) {
-      if (verbose) {
+      if (verbose>2) {
         std::cerr << "\tColumn name when merging:" << options[MERGE_COUNTS_COLNAME].arg << "\n";
       }
       merge_counts_colname = options[MERGE_COUNTS_COLNAME].arg;
@@ -328,9 +328,9 @@ int main (int argc, char *argv[]) {
   nb_samples = parse.nonOptionsCount();
 
   if (verbose>2) {
-    std::cout << "File to analyse: " << std::to_string(parse.nonOptionsCount()) << std::endl;
+    std::cerr << "File to analyse: " << std::to_string(parse.nonOptionsCount()) << std::endl;
     for (int i = 0; i < parse.nonOptionsCount(); ++i)
-      fprintf(stdout, "Non-option argument #%d is %s\n", i, parse.nonOption(i));
+      fprintf(stderr, "Non-option argument #%d is %s\n", i, parse.nonOption(i));
   }
 
   /**********************************
