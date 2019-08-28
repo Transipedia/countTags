@@ -30,6 +30,8 @@ init:
 	# Add uniq tag number at the name end
 	# Add scrable read that will not match
 	head -5 $(okfile).csv | tr '[ATGC]' '[GACT]' | sed 's/ / not/' >> $(okfile).csv
+	# Add kmer with potential problems in header (create manually from $(okfile).csv
+	cat TAGS_test_supl.csv >> $(okfile).csv
 
 	# Add shorter tags than 30; should not be analyse
 	tail -n +5 $(okfile).csv | head -4 | cut -c 1-15 | perl -p -e 'BEGIN {$$i=1};$$j=$$i++;s/\n/ shok.$$j\n/'>> $(okfile).csv
