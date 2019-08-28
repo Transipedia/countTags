@@ -129,6 +129,15 @@ struct Arg: public option::Arg
 enum  optionIndex {UNKNOWN,HELP,VERBOSE,VERSION,KMER_LENGTH,TAG_FILE,READS_WRFILE,STRANDED,PAIRED,MAX_READS,NB_THREADS,NORMALIZE,TAG_NAMES,MERGE_COUNTS,MERGE_COUNTS_COLNAME};
 const option::Descriptor usage[] =
 {
+ /* const option::Descriptor usage[] = {
+ *   { CREATE,                                            // index
+ *     OTHER,                                             // type
+ *     "c",                                               // shortopt
+ *     "create",                                          // longopt
+ *     Arg::None,                                         // check_arg
+ *     "--create  Tells the program to create something." // help
+ * }
+ */
   {UNKNOWN,      0, "" , "",
     option::Arg::None, "The purpose of countTags is to count occurences of few tags in large set of fastq files.\n\n"
                        "USAGE: countTags [options] -i tags.file seq.fastq[.gz]\n"
