@@ -117,9 +117,16 @@ struct Arg: public option::Arg
     if (msg) printError("Option '", option, "' requires a numeric argument\n");
     return option::ARG_ILLEGAL;
   }
+  static option::ArgStatus Optional(const option::Option& option, bool msg)
+  {
+    if (option.arg != 0 && option.arg[0] != 0)
+      return option::ARG_OK;
+    if (msg) printError("Option '", option, "' requires a non-empty argument\n");
+    return option::ARG_ILLEGAL;
+  }
 };
 
-enum  optionIndex {UNKNOWN,HELP,VERBOSE,VERSION,KMER_LENGTH,TAG_FILE,READS_WRFILE,STRANDED,MAX_READS,NB_THREADS,NORMALIZE,TAG_NAMES,MERGE_COUNTS,MERGE_COUNTS_COLNAME};
+enum  optionIndex {UNKNOWN,HELP,VERBOSE,VERSION,KMER_LENGTH,TAG_FILE,READS_WRFILE,STRANDED,PAIRED,MAX_READS,NB_THREADS,NORMALIZE,TAG_NAMES,MERGE_COUNTS,MERGE_COUNTS_COLNAME};
 const option::Descriptor usage[] =
 {
   {UNKNOWN,      0, "" , "",
@@ -139,7 +146,9 @@ const option::Descriptor usage[] =
   //{NB_THREADS, 0, "t","",
   //  Arg::Numeric,      "  -t=INT      \tnumber of threads" },
   {STRANDED,     0, "" , "stranded",
-    option::Arg::None, "  --stranded  \tstrand-specific protocol." },
+    option::Arg::None, "  --stranded  \tanalyse only the strand of the read and tag (no reverse-complement)." },
+  {PAIRED,     0, "" , "paired",
+    option::Arg::Optional, "  --paired [rf] \tstrand-specific protocol (can use only 2 fastq with _1 and _2 in filename)." },
   {NORMALIZE,    0, "" , "normalize",
     option::Arg::None, "  --normalize  \tnormalize counts." },
   {TAG_NAMES,    0, "t", "tag-names",
@@ -177,6 +186,8 @@ int main (int argc, char *argv[]) {
   const char * seq_file;
   uint32_t tag_length = 22;
   bool stranded = false;
+  bool ispaired = false;
+  std::string paired;
   bool normalize = false;
   bool print_tag_names = false;
   bool merge_counts = false;
@@ -269,6 +280,14 @@ int main (int argc, char *argv[]) {
 
   if (options[STRANDED]) {
     stranded = true;
+  }
+
+  if (options[PAIRED]) {
+    // turn ON paired option
+    ispaired = true;
+    if (options[PAIRED].arg) {
+      paired = options[MERGE_COUNTS_COLNAME].arg;
+    }
   }
 
   if (options[NORMALIZE]) {
