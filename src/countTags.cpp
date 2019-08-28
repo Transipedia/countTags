@@ -52,7 +52,7 @@
 
 //return the minumum value of the k-mer at pos p between strand rev and stran fwd
 //TODO add a function that get a DNA string and a k value, and return a array of vector values
-inline uint64_t valns(uint32_t p, char *dna,uint32_t k,int64_t *last,uint64_t *valfwd,uint64_t *valrev, bool stranded = false){
+inline uint64_t valns(uint32_t p, char *dna,uint32_t k,int64_t *last,uint64_t *valfwd,uint64_t *valrev, bool isstranded = false){
   int e=p-*last;
   if(e!=1){
     *last=p;
@@ -69,7 +69,7 @@ inline uint64_t valns(uint32_t p, char *dna,uint32_t k,int64_t *last,uint64_t *v
     *valrev/=1<<(2);
     *valrev+=(uint64_t)compNuc(new_nuc)<<(2*k-2);
   }
-  if(stranded || *valfwd < *valrev) {
+  if(isstranded || *valfwd < *valrev) {
     return *valfwd;
   } else {
     return *valrev;
@@ -185,7 +185,7 @@ int main (int argc, char *argv[]) {
   const char * tags_file;
   const char * seq_file;
   uint32_t tag_length = 22;
-  bool stranded = false;
+  bool isstranded = false;
   bool ispaired = false;
   std::string paired;
   bool normalize = false;
@@ -279,7 +279,7 @@ int main (int argc, char *argv[]) {
   //}
 
   if (options[STRANDED]) {
-    stranded = true;
+    isstranded = true;
   }
 
   if (options[PAIRED]) {
@@ -388,7 +388,7 @@ int main (int argc, char *argv[]) {
         continue;
       }
       // convert tag to Int
-      tag = DNAtoInt(lines.c_str(),tag_length,stranded);
+      tag = DNAtoInt(lines.c_str(),tag_length,isstranded);
       if (verbose>2)
         std::cerr << "tag: " << lines << ", name:" << tag_name << ", tagInt: " << tag;
       tags_counts[tag] = new double[nb_samples]();
@@ -473,7 +473,7 @@ int main (int argc, char *argv[]) {
         last = -3;
 
         for(i = 0; i < nb_tags; i++) {
-          it_counts = tags_counts.find(valns(i,seq,tag_length,&last,&valfwd,&valrev,stranded));
+          it_counts = tags_counts.find(valns(i,seq,tag_length,&last,&valfwd,&valrev,isstranded));
           if(it_counts != tags_counts.end()) {
             it_counts->second[sample]++;
             // output read in a file if required
