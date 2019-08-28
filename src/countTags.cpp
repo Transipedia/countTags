@@ -553,20 +553,20 @@ int main (int argc, char *argv[]) {
     std::cout << std::endl;
   }
 
-  std::cout << "total_factors";
+  std::cerr << "total_factors";
   if (print_tag_names)
-    std::cout << "\t*";
+    std::cerr << "\t*";
   if(!merge_counts) {
     for (int sample = 0; sample < nb_samples; ++sample) {
-      std::cout << "\t" << nb_factors_by_sample[sample];
+      std::cerr << "\t" << nb_factors_by_sample[sample];
     }
   } else {
     uint64_t nb_factors_sum = 0;
     for (int sample = 0; sample < nb_samples; ++sample) {
       nb_factors_sum += nb_factors_by_sample[sample];
     }
-    std::cout << "\t" << nb_factors_sum;
+    std::cerr << "\t" << nb_factors_sum;
   }
-  std::cout << std::endl;
+  std::cerr << std::endl;
 
 }
