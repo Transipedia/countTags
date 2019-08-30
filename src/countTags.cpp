@@ -264,7 +264,7 @@ int main (int argc, char *argv[]) {
   // is not working with option -V -h
   if (!options[TAG_FILE].count()) {
     std::cerr << "ERROR : -i tag_file required\n\n";
-    option::printUsage(std::cout, usage);
+    option::printUsage(std::cerr, usage);
     return 1;
   }
 
@@ -273,8 +273,8 @@ int main (int argc, char *argv[]) {
   if (options[KMER_LENGTH]) {
     tag_length = atoi(options[KMER_LENGTH].arg);
     if (tag_length > 32) {
-      std::cout << "ERROR: For now, K-mer length has to be < 32" << "\n\n";
-      option::printUsage(std::cout, usage);
+      std::cerr << "ERROR: For now, K-mer length has to be < 32" << "\n\n";
+      option::printUsage(std::cerr, usage);
       return 1;
     }
   }
@@ -323,13 +323,14 @@ int main (int argc, char *argv[]) {
 
   if (options[UNKNOWN]) {
     for (option::Option* opt = options[UNKNOWN]; opt; opt = opt->next())
-        std::cout << "Unknown option: " << opt->name << "\n";
-    option::printUsage(std::cout, usage);
+        std::cerr << "Unknown option: " << opt->name << "\n";
+    option::printUsage(std::cerr, usage);
     return 1;
   }
 
   if(parse.nonOptionsCount() < 1) {
-    option::printUsage(std::cout, usage);
+    std::cerr << "No fastq file provided ?" << "\n";
+    option::printUsage(std::cerr, usage);
     return 0;
   }
 
