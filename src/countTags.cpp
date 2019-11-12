@@ -159,11 +159,11 @@ const option::Descriptor usage[] =
   {PAIRED,     0, "" , "paired",
     option::Arg::Optional, "  --paired [rf] \tstrand-specific protocol (can use only 2 fastq with _1 and _2 in filename)." },
   {NORMALIZE,    0, "" , "normalize",
-    option::Arg::None, "  --normalize  \tnormalize counts." },
+    Arg::None, "  --normalize  \tnormalize counts." },
   {TAG_NAMES,    0, "t", "tag-names",
-    option::Arg::None, "  -t|--tag-names  \tprint tag names in the output." },
+    Arg::None, "  -t|--tag-names  \tprint tag names in the output." },
   {MERGE_COUNTS,    0,"" , "merge-counts",
-    option::Arg::None, "  --merge-counts  \tmerge counts from all input FASTQs" },
+    Arg::None, "  --merge-counts  \tmerge counts from all input FASTQs" },
   {MERGE_COUNTS_COLNAME,    0,"" , "merge-counts-colname",
     Arg::NonEmpty, "  --merge-counts-colname  \tcolumn name when merge counts is used" },
   {READS_WRFILE, 0, "r","reads",
@@ -454,7 +454,7 @@ int main (int argc, char *argv[]) {
     }
 
     // open file via pipe, so using another thread to gunzip the file
-    file = popen(tmp.append(gzip_pipe).append(parse.nonOption(sample)).c_str(),"r");
+    file = popen(tmp.append(gzip_pipe).append(parse.nonOption(sample)).c_str(), "r");
     nb_factors = 0;
 
     while ((read = getline(&line, &len, file)) != -1) {
@@ -490,10 +490,10 @@ int main (int argc, char *argv[]) {
             if (output_read.length()) {
               char *tag_seq = new char[tag_length+1];
               tag_seq[tag_length] = '\0';
-                intToDNA(it_counts->first,tag_length,tag_seq);
+                intToDNA(it_counts->first, tag_length,tag_seq);
                 hfile_read << tag_seq;
                 if(print_tag_names) {
-                  hfile_read << "\t" << join(tags_names[it_counts->first],",");
+                  hfile_read << "\t" << join(tags_names[it_counts->first], ",");
                 }
               hfile_read << "\t" << parse.nonOption(sample) << "\t" << seq;
             }
