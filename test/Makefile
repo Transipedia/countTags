@@ -23,11 +23,12 @@ test_stranded:
 init:
 	rm -f $(okfile).*
 	# use bash instead of sh to <()
-	bash -c 'jellyfish count -s 3M -m 30 -o $(jf) <(zcat test_?.fastq.gz)'
+	bash -c 'jellyfish count -s 3M -m 30 -o $(jf) <(zcat test_*.fastq.gz)'
 	jellyfish stats $(jf)
 	jellyfish dump -L 20 -c -o $(jfcount) $(jf)
-	bash -c 'for i in $$(seq 1 15); do l=$$(echo $$(( ( RANDOM % $$(wc -l $(jfcount)| cut -d " " -f1) )  + 1 )) ); tail -n +$$l $(jfcount) | head -1; done' | perl -p -e 'BEGIN {$$i=1};$$j=$$i++;s/\n/.$$j\n/' > $(okfile).csv
+	# Generate reference line $(okfile).csv
 	# Add uniq tag number at the name end
+	bash -c 'for i in $$(seq 1 15); do l=$$(echo $$(( ( RANDOM % $$(wc -l $(jfcount)| cut -d " " -f1) )  + 1 )) ); tail -n +$$l $(jfcount) | head -1; done' | perl -p -e 'BEGIN {$$i=1};$$j=$$i++;s/\n/.$$j\n/' > $(okfile).csv
 	# Add scrable read that will not match
 	head -5 $(okfile).csv | tr '[ATGC]' '[GACT]' | sed 's/ / not/' >> $(okfile).csv
 	# Add kmer with potential problems in header (create manually from $(okfile).csv
