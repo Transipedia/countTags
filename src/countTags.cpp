@@ -157,8 +157,8 @@ const option::Descriptor usage[] =
   //  Arg::Numeric,      "  -t=INT      \tnumber of threads" },
   {STRANDED,     0, "" , "stranded",
     option::Arg::None, "  --stranded  \tanalyse only the strand of the read and tag (no reverse-complement)." },
-  {PAIRED,     0, "" , "paired",
-    Arg::NonEmpty, "  --paired [rf] \tstrand-specific protocol (can use only 2 fastq with _1 and _2 in filename)." },
+  {PAIRED,       0, "" , "paired",
+    Arg::NonEmpty, "  --paired rf|fr|ff \tstrand-specific protocol (can use only 2 fastq with _1.fastq and _2.fastq in filename)." },
   {NORMALIZE,    0, "" , "normalize",
     Arg::None, "  --normalize  \tnormalize counts." },
   {TAG_NAMES,    0, "t", "tag-names",
@@ -471,7 +471,7 @@ int main (int argc, char *argv[]) {
     bool getrev = false;
 
     if (ispaired) {
-      if ( std::string(parse.nonOption(sample)).find("_1") != std::string::npos) {
+      if ( std::string(parse.nonOption(sample)).find("_1.fastq") != std::string::npos) {
         // we got the first pair
         if (paired.compare("rf") == 0) {
           getrev = true;
