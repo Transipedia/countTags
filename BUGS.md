@@ -1,5 +1,5 @@
-# [ ] 20180625-01 : Do not manage paired fastq files in stranded mode
- * Paired fastq file are not considered, always using forward strand for the two pair
+# [X] 20180625-01 : Do not manage paired fastq files in stranded mode
+ * Paired fastq file are not considered, always using forward strand for the two pair (commit 44f5dae1)
 
 # [X] 20180508-01 : Do not stop if no tag given
  * Add a test to exit if no tag given in tag file or stdin (commit 5dd253e)
