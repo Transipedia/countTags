@@ -36,12 +36,12 @@ const option::Descriptor usage[] =
 {
   {UNKNOWN, 0,"" , ""    ,
     option::Arg::None, "USAGE: mergeTagCounts [options] tag-counts1.tsv tags-counts2.tsv\n\nOptions:" },
-  {HELP,    0,"" , "help",
+  {HELP,    0,"h" , "help",
     option::Arg::None, "  --help  \tPrint usage and exit." },
-  {PROBE_LENGTH, 0, "k","",
-    Arg::Numeric,      "  -k=INT      \ttags length" },
-  {MIN_RECURRENCY, 0, "m","",
-    Arg::Numeric,      "  -m=INT      \tmin recurrency" },
+  {PROBE_LENGTH, 0, "k","kmer",
+    Arg::Numeric,      "  -k INT | --kmer=INT      \tTags length, default=30" },
+  {MIN_RECURRENCY, 0, "m","min",
+    Arg::Numeric,      "  -m INT | --min=INT     \tMinimal recurrency, default=1" },
   {0,0,0,0,0,0}
 };
 
