@@ -52,7 +52,7 @@
 
 //return the minumum value of the k-mer at pos p between strand rev and stran fwd
 //TODO add a function that get a DNA string and a k value, and return a array of vector values
-inline uint64_t valns(uint32_t p, char *dna,uint32_t k,int64_t *last,uint64_t *valfwd,uint64_t *valrev, bool isstranded = false){
+inline uint64_t valns(uint32_t p, char *dna,uint32_t k,int64_t *last,uint64_t *valfwd,uint64_t *valrev, bool isstranded = false, bool getrev = false){
   int e=p-*last;
   if(e!=1){
     *last=p;
@@ -69,6 +69,10 @@ inline uint64_t valns(uint32_t p, char *dna,uint32_t k,int64_t *last,uint64_t *v
     *valrev/=1<<(2);
     *valrev+=(uint64_t)compNuc(new_nuc)<<(2*k-2);
   }
+  // when paired and read are reverse
+  if (getrev)
+    return *valrev;
+  // otherwise
   if(isstranded || *valfwd < *valrev) {
     return *valfwd;
   } else {
@@ -157,7 +161,7 @@ const option::Descriptor usage[] =
   {STRANDED,     0, "" , "stranded",
     option::Arg::None, "  --stranded  \tanalyse only the strand of the read and tag (no reverse-complement)." },
   {PAIRED,     0, "" , "paired",
-    option::Arg::Optional, "  --paired [rf] \tstrand-specific protocol (can use only 2 fastq with _1 and _2 in filename)." },
+    Arg::NonEmpty, "  --paired [rf] \tstrand-specific protocol (can use only 2 fastq with _1 and _2 in filename)." },
   {NORMALIZE,    0, "" , "normalize",
     Arg::None, "  --normalize  \tnormalize counts." },
   {TAG_NAMES,    0, "t", "tag-names",
@@ -294,8 +298,15 @@ int main (int argc, char *argv[]) {
   if (options[PAIRED]) {
     // turn ON paired option
     ispaired = true;
-    if (options[PAIRED].arg) {
-      paired = options[MERGE_COUNTS_COLNAME].arg;
+    isstranded = true;
+    // turn ON strander mode, because it means nothing without it
+    if (options[PAIRED].count()) {
+      paired = options[PAIRED].arg;
+    } else {
+      paired = "rf";
+    }
+    if (verbose>2) {
+      std::cerr << "\tPaired mode turn ON, with option " << paired << ".\n";
     }
   }
 
@@ -457,6 +468,26 @@ int main (int argc, char *argv[]) {
     file = popen(tmp.append(gzip_pipe).append(parse.nonOption(sample)).c_str(), "r");
     nb_factors = 0;
 
+    // ispaired: have to get reverse complement for reverse pair
+    // use getrev to get the reverse complement when rf/fr/ff
+    bool getrev = false;
+
+    if (ispaired) {
+      if ( std::string(parse.nonOption(sample)).find("_1") != std::string::npos) {
+        // we got the first pair
+        if (paired.compare("rf") == 0) {
+          getrev = true;
+        }
+      } else {
+        // we got the second pair
+        if (paired.compare("fr") == 0) {
+          getrev = true;
+        }
+      }
+    }
+    if (verbose > 2)
+      std::cerr << "Paired mode ON, getrev = " << std::to_string(getrev) << ", for file " << parse.nonOption(sample) << std::endl;
+
     while ((read = getline(&line, &len, file)) != -1) {
       // If this line is a sequence
       if(line_id % 4 == 1) {
@@ -483,10 +514,11 @@ int main (int argc, char *argv[]) {
         last = -3;
 
         for(i = 0; i < nb_tags; i++) {
-          it_counts = tags_counts.find(valns(i,seq,tag_length,&last,&valfwd,&valrev,isstranded));
+          it_counts = tags_counts.find(valns(i, seq, tag_length, &last, &valfwd, &valrev, isstranded, getrev));
           if(it_counts != tags_counts.end()) {
             it_counts->second[sample]++;
             // output read in a file if required
+            // TODO: move new before loop, to avoid creation each time when option is on
             if (output_read.length()) {
               char *tag_seq = new char[tag_length+1];
               tag_seq[tag_length] = '\0';
