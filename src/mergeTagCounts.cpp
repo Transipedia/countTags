@@ -98,6 +98,7 @@ int main (int argc, char *argv[]) {
       {
         uint n = line.find(delimiter);
         string tag = line.substr(0,n);
+        // BUG: segfault if name if present = text
         uint64_t count = stoi(line.substr(n+1));
         tag_counts->setCount(tag.c_str(),s,count);
       }

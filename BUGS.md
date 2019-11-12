@@ -1,3 +1,5 @@
+# [ ] 20190930-01 : mergeTagCounts do not manage tag name in file
+
 # [X] 20180625-01 : Do not manage paired fastq files in stranded mode
  * Paired fastq file are not considered, always using forward strand for the two pair (commit 44f5dae1)
 
