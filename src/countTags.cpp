@@ -121,13 +121,6 @@ struct Arg: public option::Arg
     if (msg) printError("Option '", option, "' requires a numeric argument\n");
     return option::ARG_ILLEGAL;
   }
-  static option::ArgStatus Optional(const option::Option& option, bool msg)
-  {
-    if (option.arg != 0 && option.arg[0] != 0)
-      return option::ARG_OK;
-    if (msg) printError("Option '", option, "' requires a non-empty argument\n");
-    return option::ARG_ILLEGAL;
-  }
 };
 
 enum  optionIndex {UNKNOWN,HELP,VERBOSE,VERSION,KMER_LENGTH,TAG_FILE,READS_WRFILE,STRANDED,PAIRED,MAX_READS,NB_THREADS,NORMALIZE,TAG_NAMES,MERGE_COUNTS,MERGE_COUNTS_COLNAME};
@@ -144,14 +137,18 @@ const option::Descriptor usage[] =
  */
   {UNKNOWN,      0, "" , "",
     option::Arg::None, "The purpose of countTags is to count occurences of few tags in large set of fastq files.\n\n"
-                       "USAGE: countTags [options] -i tags.file seq.fastq[.gz]\n"
+                       "USAGE: countTags [options] -i tags.file seq.fastq[.gz] ...\n"
                        "======\n"
                        " * Tags file format: fasta, tsv (tag[ \\t]name) or raw (tag)\n"
                        " * Use '-' for reading tags from STDIN\n"
-                       "\nOptions:\n"
-                       "========" },
+                       "\nArguments:\n"
+                       "========\n" },
+  {UNKNOWN,      0, "", "",
+    option::Arg::None, "Mandatory:" },
   {TAG_FILE, 0, "i","",
-    Arg::NonEmpty,     "  -i Tag_FileName      \ttag filename, or '-' for STDIN (MANDATORY)." },
+    Arg::NonEmpty,     "  -i Tag_FileName      \ttag filename, or '-' for STDIN." },
+  {UNKNOWN,      0, "", "",
+    option::Arg::None, "Options:" },
   {KMER_LENGTH, 0, "k","",
     Arg::Numeric,      "  -k INT      \ttag length [default: 22]." },
   {MAX_READS,    0, "m", "",
@@ -166,7 +163,7 @@ const option::Descriptor usage[] =
     Arg::None, "  --normalize  \tnormalize counts." },
   {TAG_NAMES,    0, "t", "tag-names",
     Arg::None, "  -t|--tag-names  \tprint tag names in the output." },
-  {MERGE_COUNTS,    0,"" , "merge-counts",
+  {MERGE_COUNTS, 0,"" , "merge-counts",
     Arg::None, "  --merge-counts  \tmerge counts from all input FASTQs" },
   {MERGE_COUNTS_COLNAME,    0,"" , "merge-counts-colname",
     Arg::NonEmpty, "  --merge-counts-colname  \tcolumn name when merge counts is used" },
@@ -183,6 +180,7 @@ const option::Descriptor usage[] =
     option::Arg::None, "\nExamples:\n"
                        "=========\n"
                        " * countTags -k 30 --stranded -t -i MyBestTags.tsv MyAllFastq*.gz > MyCount.tsv\n"
+                       " * countTags -k 30 -i MyBestTags.tsv --paired=  MyAllFastq_1.fastq.gz MyAllFastq_2.fastq.gz > MyCount.tsv\n"
                        " * countTags -k 30 -t -i - MyAllFastq*.gz < MyBestTags.raw\n" },
   {0,0,0,0,0,0}
 };
