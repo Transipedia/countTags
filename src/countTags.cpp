@@ -123,7 +123,20 @@ struct Arg: public option::Arg
   }
 };
 
-enum  optionIndex {UNKNOWN,HELP,VERBOSE,VERSION,KMER_LENGTH,TAG_FILE,READS_WRFILE,STRANDED,PAIRED,MAX_READS,NB_THREADS,NORMALIZE,TAG_NAMES,MERGE_COUNTS,MERGE_COUNTS_COLNAME};
+enum  optionIndex {
+  KMER_LENGTH,  // kmer length to use
+  TAG_FILE,     // file with the tag
+  TAG_NAMES,    // output the tag name
+  MAX_READS,    // count on max reads
+  STRANDED,     // count in stranded mode
+  PAIRED,       // count in paired mode
+  NORMALIZE,    // normalize count on kmer factor
+  MERGE_COUNTS, // sum all column into one
+  MERGE_COUNTS_COLNAMEa, // give a name for the merge column instead of 'count'
+  READS_WRFILE, // output reads with tag in a file
+  NB_THREADS,   // number of threads to use (TODO)
+  UNKNOWN,HELP,VERBOSE,VERSION
+  };
 const option::Descriptor usage[] =
 {
  /* const option::Descriptor usage[] = {
