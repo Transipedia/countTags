@@ -187,7 +187,7 @@ const option::Descriptor usage[] =
     Arg::NonEmpty, "  --summary file    \tprint statistic in a file" },
   {VERBOSE,      0, "v", "verbose",
     option::Arg::None, "  -v|--verbose  \tPrint statistic on STDERR\n"
-                       "  -vv           \tPrint progress status on STDERR."
+                       "  -vv           \tPrint progress status on STDERR\n"
                        "  -vvv          \tPrint debug informations on STDERR." },
   {VERSION,      0, "V", "version",
     option::Arg::None, "  -V|--version  \tPrint version and exit." },
