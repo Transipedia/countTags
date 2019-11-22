@@ -132,7 +132,7 @@ enum  optionIndex {
   PAIRED,       // count in paired mode
   NORMALIZE,    // normalize count on kmer factor
   MERGE_COUNTS, // sum all column into one
-  MERGE_COUNTS_COLNAMEa, // give a name for the merge column instead of 'count'
+  MERGE_COUNTS_COLNAME, // give a name for the merge column instead of 'count'
   READS_WRFILE, // output reads with tag in a file
   NB_THREADS,   // number of threads to use (TODO)
   UNKNOWN,HELP,VERBOSE,VERSION
@@ -182,13 +182,14 @@ const option::Descriptor usage[] =
     Arg::NonEmpty, "  --merge-counts-colname  \tcolumn name when merge counts is used" },
   {READS_WRFILE, 0, "r","reads",
     Arg::NonEmpty,     "  -r|--reads fileName      \twrite reads matching kmer in fileName." },
-  {HELP,         0, "h", "help",
-    option::Arg::None, "  -h|--help  \tPrint usage and exit." },
   {VERBOSE,      0, "v", "verbose",
-    option::Arg::None, "  -v|--verbose  \tPrint progress status on STDERR\n"
+    option::Arg::None, "  -v|--verbose  \tPrint statistic on STDERR\n"
+                       "  -vv           \tPrint progress status on STDERR."
                        "  -vvv          \tPrint debug informations on STDERR." },
   {VERSION,      0, "V", "version",
     option::Arg::None, "  -V|--version  \tPrint version and exit." },
+  {HELP,         0, "h", "help",
+    option::Arg::None, "  -h|--help  \tPrint usage and exit." },
   {UNKNOWN,      0, "" , "",
     option::Arg::None, "\nExamples:\n"
                        "=========\n"
@@ -584,6 +585,7 @@ int main (int argc, char *argv[]) {
     std::cout << "\t" << merge_counts_colname;
   }
   std::cout << "\n";
+  // print tag + value
   char *tag_seq = new char[tag_length+1];
   tag_seq[tag_length] = '\0';
   for (it_counts=tags_counts.begin(); it_counts!=tags_counts.end(); ++it_counts) {
