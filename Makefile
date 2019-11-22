@@ -31,3 +31,6 @@ test_init:
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 .PHONY: test
+
+cines:
+	rsync -av --delete  ./ cines:~/shared/compil/countTags/
