@@ -48,7 +48,7 @@
 //#include <zlib.h>
 
 #define MILLION 1000000
-#define VERS "0.4.0"
+#define VERS "0.4.2"
 
 //return the minumum value of the k-mer at pos p between strand rev and stran fwd
 //TODO add a function that get a DNA string and a k value, and return a array of vector values
