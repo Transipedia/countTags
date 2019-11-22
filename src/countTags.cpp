@@ -130,6 +130,7 @@ enum  optionIndex {
   MAX_READS,    // count on max reads
   STRANDED,     // count in stranded mode
   PAIRED,       // count in paired mode
+  SUMMARY,      // output summary count in a file instead of console
   NORMALIZE,    // normalize count on kmer factor
   MERGE_COUNTS, // sum all column into one
   MERGE_COUNTS_COLNAME, // give a name for the merge column instead of 'count'
@@ -182,6 +183,8 @@ const option::Descriptor usage[] =
     Arg::NonEmpty, "  --merge-counts-colname  \tcolumn name when merge counts is used" },
   {READS_WRFILE, 0, "r","reads",
     Arg::NonEmpty,     "  -r|--reads fileName      \twrite reads matching kmer in fileName." },
+  {SUMMARY,    0,"" , "summary",
+    Arg::NonEmpty, "  --summary file    \tprint statistic in a file" },
   {VERBOSE,      0, "v", "verbose",
     option::Arg::None, "  -v|--verbose  \tPrint statistic on STDERR\n"
                        "  -vv           \tPrint progress status on STDERR."
@@ -227,6 +230,7 @@ int main (int argc, char *argv[]) {
   char * seq;
   std::string tag_name;
   std::string output_read; // store filename to output read matching kmer
+  std::string summary_file; // store summary information in a filename
   uint32_t seq_length;
   uint64_t tag;
   uint64_t valrev,valfwd;
@@ -236,6 +240,7 @@ int main (int argc, char *argv[]) {
   std::unordered_map<uint64_t,std::vector<std::string>> tags_names;
   std::unordered_map<uint64_t,double*>::iterator it_counts;
   std::vector<uint64_t> nb_factors_by_sample;
+  std::vector<uint64_t> nb_reads_by_sample;
 
   // File vars
   std::string gzip_pipe = "gunzip -fc ";
@@ -344,6 +349,12 @@ int main (int argc, char *argv[]) {
     output_read = options[READS_WRFILE].arg;
   }
 
+  if (options[SUMMARY].count()) {
+    summary_file = options[SUMMARY].arg;
+    // turn verbose to 1 at least
+    verbose = verbose ? verbose++ : 1;
+  }
+
   if (options[UNKNOWN]) {
     for (option::Option* opt = options[UNKNOWN]; opt; opt = opt->next())
         std::cerr << "Unknown option: " << opt->name << "\n";
@@ -373,7 +384,7 @@ int main (int argc, char *argv[]) {
    *********************************/
   line_id = 0;
 
-  if (verbose)
+  if (verbose > 1)
     std::cerr << "Counting k-mers" << std::endl;
   // Create hash table of k-mer counts
   line_id = 0;
@@ -439,7 +450,7 @@ int main (int argc, char *argv[]) {
     exit(2);
   }
 
-   if (verbose)
+   if (verbose > 1)
      std::cerr << "Finished indexing tags" << std::endl;
 
 
@@ -460,10 +471,33 @@ int main (int argc, char *argv[]) {
     }
   }
 
+  // open file tp output summary information
+  std::ofstream hfile_summary;
+  if (summary_file.length()) {
+    hfile_summary.open(summary_file, std::ifstream::out);
+    // check if not write error
+    if (hfile_summary.fail()) {
+      std::cerr << "Error: Can't write to summary file "<< summary_file << std::endl;
+      return 1;
+    }
+    // send cerr to hfile_summary;
+    std::cerr.rdbuf(hfile_summary.rdbuf());
+  }
+  // print arguments use to summary file
+  if (verbose) {
+    std::cerr << "Kmer_size\t" << tag_length << "\n";
+    std::cerr << "Tag file in\t" << tags_file << "\n";
+    std::cerr << "Max read\t" << max_reads << "\n";
+    std::cerr << "Normalize\t" << (normalize ? "Yes" : "No") << "\n";
+    std::cerr << "Stranded\t" << (isstranded ? "Yes" : "No") << "\n";
+    std::cerr << "Paired\t" << (ispaired ? paired : "No") << "\n";
+    std::cerr << "Merge count\t" << (merge_counts ? "Yes" : "No") << "\n";
+    std::cerr << "Write matched read in\t" << (output_read.length() ? output_read : "No") << "\n";
+  }
 //#pragma omp parallel num_threads(nb_threads)
   for (int sample = 0; sample < nb_samples; ++sample) {
-    if (verbose)
-       std::cerr << "Counting tags for file: " << parse.nonOption(sample) << "\n";
+    if (verbose > 1)
+       std::cerr << "Counting tags for file: " << "\t" << parse.nonOption(sample) << "\n";
 
     line = NULL;
     len = 0;
@@ -508,7 +542,7 @@ int main (int argc, char *argv[]) {
           break;
         }
         // Print a user-friendly output on STDERR every each XXXX reads processed
-        if (verbose && read_id % MILLION == 0) {
+        if (verbose > 1 && read_id % MILLION == 0) {
           std::cerr << (int)((double)line_id*0.25) + 1 << " reads parsed" << std::endl;
         }
         // set seq to line
@@ -547,10 +581,12 @@ int main (int argc, char *argv[]) {
       line_id++;
     }
 
+    // store statistic
     nb_factors_by_sample.push_back(nb_factors);
+    nb_reads_by_sample.push_back(line_id);
 
     if(normalize && nb_factors > 0) {
-      if (verbose)
+      if (verbose > 1 )
         std::cerr << "Normalize counts" << std::endl;
       for (it_counts=tags_counts.begin(); it_counts!=tags_counts.end(); ++it_counts) {
         // TODO We should take into accout the error rate...
@@ -563,16 +599,11 @@ int main (int argc, char *argv[]) {
     pclose(file);
     if (line)
       free(line);
-    if (verbose) {
-      std::cerr << (int)((double)line_id) + 1 << " total reads parsed" << std::endl;
-    }
   }
 
   /****
    * PRINT THE RESULTS
    */
-  if (verbose)
-    std::cerr << "tag_length: " << tag_length << "\n";
   // First print headers
   std::cout << "tag";
   if (print_tag_names)
@@ -608,9 +639,18 @@ int main (int argc, char *argv[]) {
     std::cout << std::endl;
   }
 
+  // print statistic
+  std::cerr << "# Total statistic per file\n";
+  std::cerr << "File\t";
+  if(!merge_counts) {
+    for (int sample = 0; sample < nb_samples; ++sample) {
+      std::cerr << "\t" << parse.nonOption(sample);
+    }
+  } else {
+    std::cerr << "\t" << merge_counts_colname;
+  }
+  std::cerr << "\n";
   std::cerr << "total_factors";
-  if (print_tag_names)
-    std::cerr << "\t*";
   if(!merge_counts) {
     for (int sample = 0; sample < nb_samples; ++sample) {
       std::cerr << "\t" << nb_factors_by_sample[sample];
@@ -621,6 +661,19 @@ int main (int argc, char *argv[]) {
       nb_factors_sum += nb_factors_by_sample[sample];
     }
     std::cerr << "\t" << nb_factors_sum;
+  }
+  std::cerr << std::endl;
+  std::cerr << "total_reads";
+  if(!merge_counts) {
+    for (int sample = 0; sample < nb_samples; ++sample) {
+      std::cerr << "\t" << nb_reads_by_sample[sample];
+    }
+  } else {
+    uint64_t sum = 0;
+    for (int sample = 0; sample < nb_samples; ++sample) {
+      sum += nb_reads_by_sample[sample];
+    }
+    std::cerr << "\t" << sum;
   }
   std::cerr << std::endl;
 
