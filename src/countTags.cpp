@@ -48,7 +48,7 @@
 //#include <zlib.h>
 
 #define MILLION 1000000
-#define VERS "0.4.2"
+#define VERS "0.4.3"
 
 //return the minumum value of the k-mer at pos p between strand rev and stran fwd
 //TODO add a function that get a DNA string and a k value, and return a array of vector values
@@ -198,7 +198,8 @@ const option::Descriptor usage[] =
                        "=========\n"
                        " * countTags -k 30 --stranded -t -i MyBestTags.tsv MyAllFastq*.gz > MyCount.tsv\n"
                        " * countTags -k 30 -i MyBestTags.tsv --paired=  MyAllFastq_1.fastq.gz MyAllFastq_2.fastq.gz > MyCount.tsv\n"
-                       " * countTags -k 30 -t -i - MyAllFastq*.gz < MyBestTags.raw\n" },
+                       " * countTags -k 30 -t -i - MyAllFastq*.gz < MyBestTags.raw\n"
+                       "\nVersion: " VERS "\n"},
   {0,0,0,0,0,0}
 };
 
