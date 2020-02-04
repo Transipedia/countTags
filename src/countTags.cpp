@@ -486,6 +486,7 @@ int main (int argc, char *argv[]) {
   }
   // print arguments use to summary file
   if (verbose) {
+    std::cerr << "CountTags version\t" << VERSION << "\n";
     std::cerr << "Kmer_size\t" << tag_length << "\n";
     std::cerr << "Tag file in\t" << tags_file << "\n";
     std::cerr << "Max read\t" << max_reads << "\n";
