@@ -48,7 +48,7 @@
 //#include <zlib.h>
 
 #define MILLION 1000000
-#define VERS "0.4.3"
+#define VERSION "0.4.3"
 
 //return the minumum value of the k-mer at pos p between strand rev and stran fwd
 //TODO add a function that get a DNA string and a k value, and return a array of vector values
@@ -136,7 +136,7 @@ enum  optionIndex {
   MERGE_COUNTS_COLNAME, // give a name for the merge column instead of 'count'
   READS_WRFILE, // output reads with tag in a file
   NB_THREADS,   // number of threads to use (TODO)
-  UNKNOWN,HELP,VERBOSE,VERSION
+  UNKNOWN,HELP,VERBOSE,VERSIONOPT
   };
 const option::Descriptor usage[] =
 {
@@ -189,7 +189,7 @@ const option::Descriptor usage[] =
     option::Arg::None, "  -v|--verbose  \tPrint statistic on STDERR\n"
                        "  -vv           \tPrint progress status on STDERR\n"
                        "  -vvv          \tPrint debug informations on STDERR." },
-  {VERSION,      0, "V", "version",
+  {VERSIONOPT,      0, "V", "version",
     option::Arg::None, "  -V|--version  \tPrint version and exit." },
   {HELP,         0, "h", "help",
     option::Arg::None, "  -h|--help  \tPrint usage and exit." },
@@ -199,7 +199,7 @@ const option::Descriptor usage[] =
                        " * countTags -k 30 --stranded -t -i MyBestTags.tsv MyAllFastq*.gz > MyCount.tsv\n"
                        " * countTags -k 30 -i MyBestTags.tsv --paired=  MyAllFastq_1.fastq.gz MyAllFastq_2.fastq.gz > MyCount.tsv\n"
                        " * countTags -k 30 -t -i - MyAllFastq*.gz < MyBestTags.raw\n"
-                       "\nVersion: " VERS "\n"},
+                       "\nVersion: " VERSION "\n"},
   {0,0,0,0,0,0}
 };
 
@@ -272,8 +272,8 @@ int main (int argc, char *argv[]) {
     return 0;
   }
 
-  if (options[VERSION]) {
-    std::cout << VERS;
+  if (options[VERSIONOPT]) {
+    std::cout << VERSION;
     return 0;
   }
 
