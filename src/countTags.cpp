@@ -48,6 +48,7 @@
 //#include <zlib.h>
 
 #define MILLION 1000000
+#define BILLION 1000000000
 #define VERSION "0.4.3"
 
 //return the minumum value of the k-mer at pos p between strand rev and stran fwd
@@ -132,6 +133,7 @@ enum  optionIndex {
   PAIRED,       // count in paired mode
   SUMMARY,      // output summary count in a file instead of console
   NORMALIZE,    // normalize count on kmer factor
+  BILLIONOPT,      // normalize count on kmer factor by billion instead of million
   MERGE_COUNTS, // sum all column into one
   MERGE_COUNTS_COLNAME, // give a name for the merge column instead of 'count'
   READS_WRFILE, // output reads with tag in a file
@@ -174,8 +176,10 @@ const option::Descriptor usage[] =
     option::Arg::None, "  --stranded  \tanalyse only the strand of the read and tag (no reverse-complement)." },
   {PAIRED,       0, "" , "paired",
     Arg::NonEmpty, "  --paired rf|fr|ff \tstrand-specific protocol (can use only 2 fastq with _1.fastq and _2.fastq in filename)." },
-  {NORMALIZE,    0, "" , "normalize",
-    Arg::None, "  --normalize  \tnormalize count on total kmer present in each sample." },
+  {NORMALIZE,    0, "n" , "normalize",
+    Arg::None, "  -n|--normalize  \tnormalize count on total of million of kmer present in each sample." },
+  {BILLIONOPT,    0, "b" , "kbpnormalize",
+    Arg::None, "  -b|--kbp \tnormalize count by billion of kmer instead of million (impliy -n|--normalize)." },
   {TAG_NAMES,    0, "t", "tag-names",
     Arg::None, "  -t|--tag-names  \tprint tag names in the output." },
   {MERGE_COUNTS, 0,"" , "merge-counts",
@@ -220,6 +224,7 @@ int main (int argc, char *argv[]) {
   bool ispaired = false;
   std::string paired;
   bool normalize = false;
+  uint64_t normalize_factors; // normalize factor MIllION or BILLION
   bool print_tag_names = false;
   bool merge_counts = false;
   std::string merge_counts_colname = "counts";
@@ -332,6 +337,12 @@ int main (int argc, char *argv[]) {
 
   if (options[NORMALIZE]) {
     normalize = true;
+    normalize_factors = MILLION;
+  }
+
+  if (options[BILLION]) {
+    normalize = true;
+    normalize_factors = BILLION;
   }
 
   if (options[TAG_NAMES]) {
@@ -493,6 +504,9 @@ int main (int argc, char *argv[]) {
     std::cerr << "Tag file in\t" << tags_file << "\n";
     std::cerr << "Max read\t" << max_reads << "\n";
     std::cerr << "Normalize\t" << (normalize ? "Yes" : "No") << "\n";
+    if (normalize) {
+      std::cerr << "Normalize by " << normalize_factors << " of kmer.";
+    }
     std::cerr << "Stranded\t" << (isstranded ? "Yes" : "No") << "\n";
     std::cerr << "Paired\t" << (ispaired ? paired : "No") << "\n";
     std::cerr << "Merge count\t" << (merge_counts ? "Yes" : "No") << "\n";
@@ -595,7 +609,7 @@ int main (int argc, char *argv[]) {
       for (it_counts=tags_counts.begin(); it_counts!=tags_counts.end(); ++it_counts) {
         // TODO We should take into accout the error rate...
         if(it_counts->second[sample] > 0)
-          it_counts->second[sample] = it_counts->second[sample] * MILLION / nb_factors;
+          it_counts->second[sample] = it_counts->second[sample] * normalize_factors / nb_factors;
       }
     }
 
