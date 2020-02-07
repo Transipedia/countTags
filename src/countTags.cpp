@@ -155,6 +155,7 @@ const option::Descriptor usage[] =
                        "======\n"
                        " * Tags file format: fasta, tsv (tag[ \\t]name) or raw (tag)\n"
                        " * Use '-' for reading tags from STDIN\n"
+                       " * for now, countTags can't read tag file in gzip format, uncompress before and pass to countTags via a pipe (see example hereafter)\n"
                        "\nArguments:\n"
                        "========\n" },
   {UNKNOWN,      0, "", "",
@@ -174,7 +175,7 @@ const option::Descriptor usage[] =
   {PAIRED,       0, "" , "paired",
     Arg::NonEmpty, "  --paired rf|fr|ff \tstrand-specific protocol (can use only 2 fastq with _1.fastq and _2.fastq in filename)." },
   {NORMALIZE,    0, "" , "normalize",
-    Arg::None, "  --normalize  \tnormalize counts." },
+    Arg::None, "  --normalize  \tnormalize count on total kmer present in each sample." },
   {TAG_NAMES,    0, "t", "tag-names",
     Arg::None, "  -t|--tag-names  \tprint tag names in the output." },
   {MERGE_COUNTS, 0,"" , "merge-counts",
@@ -182,7 +183,7 @@ const option::Descriptor usage[] =
   {MERGE_COUNTS_COLNAME,    0,"" , "merge-counts-colname",
     Arg::NonEmpty, "  --merge-counts-colname  \tcolumn name when merge counts is used" },
   {READS_WRFILE, 0, "r","reads",
-    Arg::NonEmpty,     "  -r|--reads fileName      \twrite reads matching kmer in fileName." },
+    Arg::NonEmpty,     "  -r|--reads fileName      \twrite reads matching kmer in a fileName (for now store tag and read only, it's not a fastq file" },
   {SUMMARY,    0,"" , "summary",
     Arg::NonEmpty, "  --summary file    \tprint statistic in a file" },
   {VERBOSE,      0, "v", "verbose",
@@ -199,6 +200,7 @@ const option::Descriptor usage[] =
                        " * countTags -k 30 --stranded -t -i MyBestTags.tsv MyAllFastq*.gz > MyCount.tsv\n"
                        " * countTags -k 30 -i MyBestTags.tsv --paired=  MyAllFastq_1.fastq.gz MyAllFastq_2.fastq.gz > MyCount.tsv\n"
                        " * countTags -k 30 -t -i - MyAllFastq*.gz < MyBestTags.raw\n"
+                       " * zcat MyBestTags.raw.gz | countTags -k 30 -t -i - --summary mystats.summary MyAllFastq*.gz > MyCount_table.tsv\n"
                        "\nVersion: " VERSION "\n"},
   {0,0,0,0,0,0}
 };
