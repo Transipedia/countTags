@@ -168,8 +168,8 @@ const option::Descriptor usage[] =
     option::Arg::None, "Options:" },
   {KMER_LENGTH, 0, "k","",
     Arg::Numeric,      "  -k INT      \ttag length [default: 22]." },
-  {MAX_READS,    0, "m", "",
-    Arg::Numeric,      "  -m INT      \tmax number of reads [default: UINT32_MAX]." },
+  {MAX_READS,    0, "", "maxreads",
+    Arg::Numeric,      "  --maxreads INT      \tmax number of reads to analyze [default: INT32_MAX]." },
   //{NB_THREADS, 0, "t","",
   //  Arg::Numeric,      "  -t=INT      \tnumber of threads" },
   {STRANDED,     0, "" , "stranded",
@@ -502,7 +502,8 @@ int main (int argc, char *argv[]) {
     std::cerr << "CountTags version\t" << VERSION << "\n";
     std::cerr << "Kmer_size\t" << tag_length << "\n";
     std::cerr << "Tag file in\t" << tags_file << "\n";
-    std::cerr << "Max read\t" << max_reads << "\n";
+    if (max_reads < UINT32_MAX)
+      std::cerr << "Maximun reads analyzed\t" << max_reads << "\n";
     std::cerr << "Normalize\t" << (normalize ? "Yes" : "No") << "\n";
     if (normalize) {
       std::cerr << "Normalize by " << normalize_factors << " of kmer.";
