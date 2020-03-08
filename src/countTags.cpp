@@ -43,13 +43,14 @@
 #include <unistd.h>
 #include <string>
 
+// local .h
 #include "optionparser.h"
 #include "dna.h"
+#include "version.h"
 //#include <zlib.h>
 
 #define MILLION 1000000
 #define BILLION 1000000000
-#define VERSION "0.4.3"
 
 //return the minumum value of the k-mer at pos p between strand rev and stran fwd
 //TODO add a function that get a DNA string and a k value, and return a array of vector values
@@ -154,6 +155,7 @@ const option::Descriptor usage[] =
   {UNKNOWN,      0, "" , "",
     option::Arg::None, "The purpose of countTags is to count occurences of few tags in large set of fastq files.\n\n"
                        "USAGE: countTags [options] -i tags.file seq.fastq[.gz] ...\n"
+                       "\nVersion: " VERSION "\n"
                        "======\n"
                        " * Tags file format: fasta, tsv (tag[ \\t]name) or raw (tag)\n"
                        " * Use '-' for reading tags from STDIN\n"
@@ -205,7 +207,7 @@ const option::Descriptor usage[] =
                        " * countTags -k 30 -i MyBestTags.tsv --paired=  MyAllFastq_1.fastq.gz MyAllFastq_2.fastq.gz > MyCount.tsv\n"
                        " * countTags -k 30 -t -i - MyAllFastq*.gz < MyBestTags.raw\n"
                        " * zcat MyBestTags.raw.gz | countTags -k 30 -t -i - --summary mystats.summary MyAllFastq*.gz > MyCount_table.tsv\n"
-                       "\nVersion: " VERSION "\n"},
+                       },
   {0,0,0,0,0,0}
 };
 
@@ -215,7 +217,6 @@ public:
 };
 
 int main (int argc, char *argv[]) {
-
   // Config vars
   const char * tags_file;
   const char * seq_file;
@@ -258,6 +259,7 @@ int main (int argc, char *argv[]) {
   size_t len = 0;
   ssize_t read;
   uint32_t line_id = 0;
+
 
   /**********************************
    *
@@ -386,9 +388,11 @@ int main (int argc, char *argv[]) {
   nb_samples = parse.nonOptionsCount();
 
   if (verbose>2) {
+    std::cerr <<  "Version: " << VERSION << std::endl;
     std::cerr << "File to analyse: " << std::to_string(parse.nonOptionsCount()) << std::endl;
     for (int i = 0; i < parse.nonOptionsCount(); ++i)
       fprintf(stderr, "Non-option argument #%d is %s\n", i, parse.nonOption(i));
+
   }
 
   /**********************************

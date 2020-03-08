@@ -8,6 +8,7 @@ MAIN_FILES := mergeTagCounts.cpp countTags.cpp
 
 BINARIES 	= $(addprefix $(BIN_DIR)/, $(MAIN_FILES:.cpp=))
 OBJECTS		= $(addprefix $(SRC_DIR)/,$(OBJ_FILES:.cpp=.o))
+VERSION := $(shell git describe --tags --always | sed 's/countTags\///')
 
 all: $(addprefix $(BIN_DIR)/, $(MAIN_FILES:.cpp=))
 
@@ -21,6 +22,7 @@ $(SRC_DIR)/%.o: $(SRC_DIR)/%.cpp
 
 $(BIN_DIR)/%: $(SRC_DIR)/%.cpp $(OBJECTS)
 	mkdir -p $(BIN_DIR)
+	echo "#define VERSION \"$(VERSION)\"" > src/version.h
 	$(CXX) $(CXXFLAGS) $(LIBS) -o $@ $^
 
 test:
