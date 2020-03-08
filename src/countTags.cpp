@@ -224,7 +224,7 @@ int main (int argc, char *argv[]) {
   bool ispaired = false;
   std::string paired;
   bool normalize = false;
-  uint64_t normalize_factors; // normalize factor MIllION or BILLION
+  double normalize_factors; // normalize factor MILLION or BILLION
   bool print_tag_names = false;
   bool merge_counts = false;
   std::string merge_counts_colname = "counts";
@@ -340,7 +340,7 @@ int main (int argc, char *argv[]) {
     normalize_factors = MILLION;
   }
 
-  if (options[BILLION]) {
+  if (options[BILLIONOPT]) {
     normalize = true;
     normalize_factors = BILLION;
   }
@@ -506,7 +506,7 @@ int main (int argc, char *argv[]) {
       std::cerr << "Maximun reads analyzed\t" << max_reads << "\n";
     std::cerr << "Normalize\t" << (normalize ? "Yes" : "No") << "\n";
     if (normalize) {
-      std::cerr << "Normalize by " << normalize_factors << " of kmer.";
+      std::cerr << "Normalize by " << normalize_factors << " of kmer." << "\n";
     }
     std::cerr << "Stranded\t" << (isstranded ? "Yes" : "No") << "\n";
     std::cerr << "Paired\t" << (ispaired ? paired : "No") << "\n";
@@ -604,15 +604,16 @@ int main (int argc, char *argv[]) {
     nb_factors_by_sample.push_back(nb_factors);
     nb_reads_by_sample.push_back(line_id);
 
-    if(normalize && nb_factors > 0) {
-      if (verbose > 1 )
-        std::cerr << "Normalize counts" << std::endl;
-      for (it_counts=tags_counts.begin(); it_counts!=tags_counts.end(); ++it_counts) {
-        // TODO We should take into accout the error rate...
-        if(it_counts->second[sample] > 0)
-          it_counts->second[sample] = it_counts->second[sample] * normalize_factors / nb_factors;
-      }
-    }
+//    if(normalize && nb_factors > 0) {
+//      if (verbose > 1 )
+//        std::cerr << "Normalize counts" << std::endl;
+//      for (it_counts=tags_counts.begin(); it_counts!=tags_counts.end(); ++it_counts) {
+//        // TODO We should take into accout the error rate...
+//        if(it_counts->second[sample] > 0) {
+//          it_counts->second[sample] = it_counts->second[sample] * normalize_factors / nb_factors;
+//        }
+//      }
+//    }
 
     // Close file and clear line buffer
     pclose(file);
