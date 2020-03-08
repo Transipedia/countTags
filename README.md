@@ -16,6 +16,8 @@ You can use three tags format:
 
 Use option '-i' to specify the tag file
 You can provide the tags file via the standard input by using '-i -' as filename.
+If you file is gziped or using other compression format, uncrompress the file
+with the right and pass to countTags via the pipe and option '-i -'.
 
 All tags must have at least the K-mer length, if too short, tags are discarded.
 The maximum authorize tag length is 32bp.
@@ -26,16 +28,24 @@ For example :
 
 `countTags -k 31 file.fa file1.fastq.gz file2.fastq.gz`
 
-### Managing Paired-End files
-
-For paired-end files, you need to apply a post treatment to merge counts
-produced separatly for each fastq file.
-
 ### Managing stranded files
 
-For stranded fastq, you need to set the `--stranded` option. If you are using PE
-stranded FASTQ files, you need to manually reverse one of the pair according to
-the protocol orientation.
+By default, countTags count the canonical tag between the forward and the reverse tag
+(the first one in alphabeticl order) and output this sequence in the result.
 
-Without this option, you will get either your tag sequence or the reverse-complement,
-which one come first by alphabetic order.
+If you want only one strand to be count, you have to provide the tag sequence in the strand that
+you want to count  and use the option '--stranded' for countTags.
+Therefore, for stranded paired fastq files you will count only one pair, the one in the same
+strand that your tag. For paired fastq see below the '--paired' option.
+
+### Managing Paired-End files
+
+You can now use the '--paired format' option to count stranded pair-end fastq file.
+You have to specify the pair-end format: either 'rf' (the most used), 'fr' or 'rr'
+in accordance with the library setup. In this case, only the two paired fastq file must be given.
+
+When you set the paired option, the stranded option is set to true, otherwise this is
+meaning nothing.
+
+For paired-end files, you can use the '--merge-counts' option to get the total count for the sample.
+
