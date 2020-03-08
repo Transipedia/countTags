@@ -51,7 +51,7 @@ void CountsTable::setSampleName(uint sample_id, const char *sample_name) {
 
 uint32_t CountsTable::getCount(const char *kmer, uint sample_id) {
   uint64_t kmer_int = DNAtoInt(kmer, this->kmer_length, this->stranded);
-  this->getCount(kmer_int,sample_id);
+  return this->getCount(kmer_int,sample_id);
 }
 
 uint32_t CountsTable::getCount(uint64_t kmer, uint sample_id) {
