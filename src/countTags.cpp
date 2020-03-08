@@ -511,7 +511,7 @@ int main (int argc, char *argv[]) {
     std::cerr << "Stranded\t" << (isstranded ? "Yes" : "No") << "\n";
     std::cerr << "Paired\t" << (ispaired ? paired : "No") << "\n";
     std::cerr << "Merge count\t" << (merge_counts ? "Yes" : "No") << "\n";
-    std::cerr << "Write matched read in\t" << (output_read.length() ? output_read : "No") << "\n";
+    std::cerr << "Write matched read in file\t" << (output_read.length() ? output_read : "None") << "\n";
   }
 //#pragma omp parallel num_threads(nb_threads)
   for (int sample = 0; sample < nb_samples; ++sample) {
