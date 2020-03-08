@@ -2,7 +2,7 @@
 
 ## Installation
 
-1. Clone this repository : `git clone https://github.com/jaudoux/countTags.git`
+1. Clone this repository : `git clone https://gitlab:get/counttags.git`
 2. Compile the software : `make`
 3. Place the binary somewhere acessible in your `$PATH`
 
