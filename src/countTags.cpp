@@ -207,7 +207,7 @@ const option::Descriptor usage[] =
     option::Arg::None, "\nExamples:\n"
                        "=========\n"
                        " * countTags -k 30 --stranded -t -i MyBestTags.tsv MyAllFastq*.gz > MyCount.tsv\n"
-                       " * countTags -k 30 -i MyBestTags.tsv --paired=  MyAllFastq_1.fastq.gz MyAllFastq_2.fastq.gz > MyCount.tsv\n"
+                       " * countTags -k 30 -i MyBestTags.tsv --paired rf  MyAllFastq_1.fastq.gz MyAllFastq_2.fastq.gz > MyCount.tsv\n"
                        " * countTags -k 30 -t -i - MyAllFastq*.gz < MyBestTags.raw\n"
                        " * zcat MyBestTags.raw.gz | countTags -k 30 -t -i - --summary mystats.summary MyAllFastq*.gz > MyCount_table.tsv\n"
                        },
