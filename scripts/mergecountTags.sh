@@ -19,7 +19,7 @@ with option
   -d dir	  : take all files from that directory, and from argument line
   -n        : kmer name are present in countTags file
   -s        : regroup summary files as well
-	-v        : verbose mode
+  -v        : verbose mode
 	-h				: help
 EOF
    exit 1
@@ -65,6 +65,7 @@ if [ "$dir" != "" ]
 then
   files="$files $(find $dir -type f -name '*.tsv')"
 fi
+[ $debug ] && >&2 echo "files= $files"
 
 # create a tempory directory
 temp=$(mktemp -d)
@@ -75,6 +76,7 @@ then
   echo "Check your permissions"
   exit 1
 fi
+[ $debug ] && >&2 echo "tmpdir= $temp"
 
 # store filename of one file to get the first two columns
 afile=''
