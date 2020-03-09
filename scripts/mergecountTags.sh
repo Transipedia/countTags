@@ -18,7 +18,6 @@ with option
   -o file   : output in file instead of STDOUT
   -d dir	  : take all files from that directory, and from argument line
   -n        : kmer name are present in countTags file
-  -s        : regroup summary files as well
   -v        : verbose mode
 	-h				: help
 EOF
@@ -28,8 +27,6 @@ EOF
 # variables
 # kmer name are present or not
 countcol=2
-# do you group summary file ?
-dosummary=0
 # output filename
 outputfile=""
 
@@ -40,7 +37,6 @@ do
     o)  outputfile=$OPTARG;;
 		d)	dir=$OPTARG;;
     n)  countcol=3;;
-    s)  dosummary=1;;
 		v)	debug=1;;
 		h)	usage;;
 		\?)	echo "Wrong arguments"
@@ -111,6 +107,30 @@ cat <(head -7 ${afile/tsv/summary}) <(paste <(tail -n 3 ${afile/tsv/summary} | c
 if [ $? -eq 0 ]
 then
   echo "Completed job" >&2
+# Test if we have summary file
+if [ -s ${afile/tsv/summary} ]
+then
+  OKrm=0   # turn off in case problem with summary files
+  # take name from $dir if no $outputfile given
+  if [ "$outputfile" == "" ]
+  then
+    if [ "$dir" != "" ]
+    then
+      outputfile=$(basename $dir)
+    else
+      outputfile=$TODAY-results
+    fi
+  fi
+  cat <(head -7 ${afile/tsv/summary}) <(paste <(tail -n 3 ${afile/tsv/summary} | cut -f 1,$colname) $temp/*.summary) > $outputfile.summary
+  if [ $? -eq 0 ]
+  then
+    echo "Completed job for summary files" >&2
+    OKrm=1
+  else
+    echo "Error when merging all summary files from $temp"
+    exit 1
+  fi
+fi
   rm -rf $temp
 else
   echo "Error when merging all file from $temp"
