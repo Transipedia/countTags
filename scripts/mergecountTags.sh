@@ -15,7 +15,7 @@ usage () {
 
 Usage: $0 "parameters"
 with option
-  -o file   : output in file instead of STDOUT
+  -o file   : output in file instead of STDOUT, without extension
   -d dir	  : take all files from that directory, and from argument line
   -n        : kmer name are present in countTags file
   -v        : verbose mode
@@ -101,12 +101,27 @@ then
   exit 1
 fi
 colname=$(($countcol - 1))
-paste <(cut -f 1,$colname $afile) $temp/*.tsv > $outputfile.tsv
-cat <(head -7 ${afile/tsv/summary}) <(paste <(tail -n 3 ${afile/tsv/summary} | cut -f 1,$colname) $temp/*.summary) > $outputfile.summary
 
+# test if everthing was rigth
+OKrm=0
+
+# Do we output to STDOUT or in a file ?
+outputformat="/dev/stdout"
+if [ "$outputfile" != "" ]
+then
+  outputformat="$outputfile.tsv"
+fi
+
+paste <(cut -f 1,$colname $afile) $temp/*.tsv > $outputformat
 if [ $? -eq 0 ]
 then
-  echo "Completed job" >&2
+  echo "Completed job for tsv files" >&2
+  OKrm=1
+else
+  echo "Error when merging all tsv files from $temp"
+  exit 1
+fi
+
 # Test if we have summary file
 if [ -s ${afile/tsv/summary} ]
 then
@@ -131,8 +146,12 @@ then
     exit 1
   fi
 fi
+
+if [ "$OKrm" == 1 ]
+then
+  echo "Completed all jobs" >&2
   rm -rf $temp
 else
-  echo "Error when merging all file from $temp"
+  echo "Error when merging some files from $temp"
   exit 1
 fi
