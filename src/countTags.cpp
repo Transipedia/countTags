@@ -131,6 +131,7 @@ enum  optionIndex {
   TAG_NAMES,    // output the tag name
   MAX_READS,    // count on max reads
   STRANDED,     // count in stranded mode
+  NOSTRANDED,   // count in no-stranded mode, usefull instead of having an empty option
   PAIRED,       // count in paired mode
   SUMMARY,      // output summary count in a file instead of console
   NORMALIZE,    // normalize count on kmer factor
@@ -176,6 +177,8 @@ const option::Descriptor usage[] =
   //  Arg::Numeric,      "  -t=INT      \tnumber of threads" },
   {STRANDED,     0, "" , "stranded",
     option::Arg::None, "  --stranded  \tanalyse only the strand of the read and tag (no reverse-complement)." },
+  {NOSTRANDED,     0, "" , "nostranded",
+    option::Arg::None, "  --nostranded  \tturn off stranded mode, do not care about strand." },
   {PAIRED,       0, "" , "paired",
     Arg::NonEmpty, "  --paired rf|fr|ff \tstrand-specific protocol (can use only 2 fastq with _1.fastq and _2.fastq in filename)." },
   {NORMALIZE,    0, "n" , "normalize",
@@ -335,6 +338,11 @@ int main (int argc, char *argv[]) {
     if (verbose>2) {
       std::cerr << "\tPaired mode turn ON, with option " << paired << ".\n";
     }
+  }
+
+  if (options[NOSTRANDED]) {
+    isstranded = false;
+    ispaired = false;
   }
 
   if (options[NORMALIZE]) {
