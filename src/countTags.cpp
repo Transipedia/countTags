@@ -133,6 +133,7 @@ enum  optionIndex {
   STRANDED,     // count in stranded mode
   NOSTRANDED,   // count in no-stranded mode, usefull instead of having an empty option
   PAIRED,       // count in paired mode
+  ALLTAGS,      // use all tags if sequence length > kmer length
   SUMMARY,      // output summary count in a file instead of console
   NORMALIZE,    // normalize count on kmer factor
   BILLIONOPT,      // normalize count on kmer factor by billion instead of million
@@ -181,6 +182,8 @@ const option::Descriptor usage[] =
     option::Arg::None, "  --nostranded  \tturn off stranded mode, do not care about strand." },
   {PAIRED,       0, "" , "paired",
     Arg::NonEmpty, "  --paired rf|fr|ff \tstrand-specific protocol (can use only 2 fastq with _1.fastq and _2.fastq in filename)." },
+  {ALLTAGS,       0, "a" , "alltags",
+    Arg::None, "  -a|--alltags \tGenerate all tags from the sequence if its length is greater than kmer length." },
   {NORMALIZE,    0, "n" , "normalize",
     Arg::None, "  -n|--normalize  \tnormalize count on total of million of kmer present in each sample." },
   {BILLIONOPT,    0, "b" , "kbpnormalize",
@@ -226,9 +229,10 @@ int main (int argc, char *argv[]) {
   uint32_t tag_length = 22;
   bool isstranded = false;
   bool ispaired = false;
+  bool doalltags = false;               // switch for alltags option
   std::string paired;
   bool normalize = false;
-  double normalize_factors; // normalize factor MILLION or BILLION
+  double normalize_factors;             // normalize factor MILLION or BILLION
   bool print_tag_names = false;
   bool merge_counts = false;
   std::string merge_counts_colname = "counts";
@@ -345,6 +349,10 @@ int main (int argc, char *argv[]) {
     ispaired = false;
   }
 
+  if (options[ALLTAGS]) {
+    doalltags = true;
+  }
+
   if (options[NORMALIZE]) {
     normalize = true;
     normalize_factors = MILLION;
@@ -458,12 +466,26 @@ int main (int argc, char *argv[]) {
         continue;
       }
       // convert tag to Int
-      tag = DNAtoInt(lines.c_str(),tag_length,isstranded);
-      if (verbose>2)
-        std::cerr << "tag: " << lines << ", name:" << tag_name << ", tagInt: " << tag;
-      tags_counts[tag] = new double[nb_samples]();
-      tags_names[tag].push_back(tag_name);
-      nb_tags++;
+      uint32_t max_kmer_toread = 1;    // at least we get the first kmer
+
+      // take all kmer from lines if ALLTAGS option is set
+      if (doalltags) {
+        max_kmer_toread = lines.length() - tag_length + 1;
+      }
+
+      for (uint32_t i = 0; i < max_kmer_toread ; i++){
+        tag = DNAtoInt(lines.substr(i, tag_length).c_str(), tag_length, isstranded);
+        if (verbose>2)
+          std::cerr << "tag: " << lines.substr(i, tag_length) << ", name:" << tag_name << ", tag nb: " << i << ", tagInt: " << tag;
+        tags_counts[tag] = new double[nb_samples]();
+        if (! doalltags)
+          tags_names[tag].push_back(tag_name);
+        else {
+          std::string tempstr = tag_name;
+          tags_names[tag].push_back(tempstr.append(".").append(std::to_string(i)));
+        }
+        nb_tags++;
+      }
       if (verbose>2)
        std::cerr << ", nb_tag: " << nb_tags << std::endl;
     }
