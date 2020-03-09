@@ -15,8 +15,10 @@ usage () {
 
 Usage: $0 "parameters"
 with option
+  -o file   : output in file instead of STDOUT
   -d dir	  : take all files from that directory, and from argument line
   -n        : kmer name are present in countTags file
+  -s        : regroup summary files as well
 	-v        : verbose mode
 	-h				: help
 EOF
@@ -26,13 +28,19 @@ EOF
 # variables
 # kmer name are present or not
 countcol=2
+# do you group summary file ?
+dosummary=0
+# output filename
+outputfile=""
 
 #Read in the various options.
-while getopts d:nvh OPT
+while getopts o:d:nsvh OPT
 do
 	case $OPT in
+    o)  outputfile=$OPTARG;;
 		d)	dir=$OPTARG;;
     n)  countcol=3;;
+    s)  dosummary=1;;
 		v)	debug=1;;
 		h)	usage;;
 		\?)	echo "Wrong arguments"
@@ -55,7 +63,7 @@ then
 fi
 if [ "$dir" != "" ]
 then
-  files="$files $(find $dir -type f)"
+  files="$files $(find $dir -type f -name '*.tsv')"
 fi
 
 # create a tempory directory
@@ -75,6 +83,7 @@ afile=''
 for file in $files
 do
   cut -f $countcol- $file > $temp/$(basename $file)
+  [ -s ${file/tsv/summary} ] && tail -n 3 ${file/tsv/summary} | cut -f $countcol-  > $temp/$(basename $file .tsv).summary
   afile=$file
 done
 
@@ -94,7 +103,8 @@ then
   exit 1
 fi
 colname=$(($countcol - 1))
-paste <(cut -f 1,$colname $afile) $temp/*
+paste <(cut -f 1,$colname $afile) $temp/*.tsv > $outputfile.tsv
+cat <(head -7 ${afile/tsv/summary}) <(paste <(tail -n 3 ${afile/tsv/summary} | cut -f 1,$colname) $temp/*.summary) > $outputfile.summary
 
 if [ $? -eq 0 ]
 then
