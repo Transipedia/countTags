@@ -697,42 +697,44 @@ int main (int argc, char *argv[]) {
     std::cout << std::endl;
   }
 
-  // print statistic
-  std::cerr << "# Total statistic per file\n";
-  std::cerr << "File\t";
-  if(!merge_counts) {
-    for (uint32_t sample = 0; sample < nb_samples; ++sample) {
-      std::cerr << "\t" << parse.nonOption(sample);
-    }
-  } else {
-    std::cerr << "\t" << merge_counts_colname;
-  }
-  std::cerr << "\n";
-  std::cerr << "total_factors";
-  if(!merge_counts) {
-    for (uint32_t sample = 0; sample < nb_samples; ++sample) {
-      std::cerr << "\t" << nb_factors_by_sample[sample];
-    }
-  } else {
-    uint64_t nb_factors_sum = 0;
-    for (uint32_t sample = 0; sample < nb_samples; ++sample) {
-      nb_factors_sum += nb_factors_by_sample[sample];
-    }
-    std::cerr << "\t" << nb_factors_sum;
-  }
-  std::cerr << std::endl;
-  std::cerr << "total_reads";
-  if(!merge_counts) {
-    for (uint32_t sample = 0; sample < nb_samples; ++sample) {
-      std::cerr << "\t" << nb_reads_by_sample[sample];
-    }
-  } else {
-    uint64_t sum = 0;
-    for (uint32_t sample = 0; sample < nb_samples; ++sample) {
-      sum += nb_reads_by_sample[sample];
-    }
-    std::cerr << "\t" << sum;
-  }
-  std::cerr << std::endl;
 
+  // print statistic if verbose or summary
+  if (verbose) {
+    std::cerr << "# Total statistic per file\n";
+    std::cerr << "File\t";
+    if(!merge_counts) {
+      for (uint32_t sample = 0; sample < nb_samples; ++sample) {
+        std::cerr << "\t" << parse.nonOption(sample);
+      }
+    } else {
+      std::cerr << "\t" << merge_counts_colname;
+    }
+    std::cerr << "\n";
+    std::cerr << "total_factors";
+    if(!merge_counts) {
+      for (uint32_t sample = 0; sample < nb_samples; ++sample) {
+        std::cerr << "\t" << nb_factors_by_sample[sample];
+      }
+    } else {
+      uint64_t nb_factors_sum = 0;
+      for (uint32_t sample = 0; sample < nb_samples; ++sample) {
+        nb_factors_sum += nb_factors_by_sample[sample];
+      }
+      std::cerr << "\t" << nb_factors_sum;
+    }
+    std::cerr << std::endl;
+    std::cerr << "total_reads";
+    if(!merge_counts) {
+      for (uint32_t sample = 0; sample < nb_samples; ++sample) {
+        std::cerr << "\t" << nb_reads_by_sample[sample];
+      }
+    } else {
+      uint64_t sum = 0;
+      for (uint32_t sample = 0; sample < nb_samples; ++sample) {
+        sum += nb_reads_by_sample[sample];
+      }
+      std::cerr << "\t" << sum;
+    }
+    std::cerr << std::endl;
+  }
 }
