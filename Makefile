@@ -38,3 +38,6 @@ test_init:
 
 cines:
 	rsync -av --delete  ./ cines:~/shared/compil/countTags/
+
+changelog:
+	gitchangelog ^countTags/0.4.5 HEAD
