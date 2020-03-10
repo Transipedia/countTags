@@ -37,6 +37,7 @@
 #include <string.h>
 #include <cstdint>
 #include <vector>
+#include <memory>
 #include <unordered_map>
 #include <stdlib.h>
 #include <stdio.h>
@@ -47,7 +48,7 @@
 #include "optionparser.h"
 #include "dna.h"
 #include "version.h"
-//#include <zlib.h>
+#include "zstr.hpp"
 
 #define MILLION 1000000
 #define BILLION 1000000000
@@ -423,19 +424,15 @@ int main (int argc, char *argv[]) {
   line_id = 0;
   nb_tags = 0;
 
-  std::istream *filein;
-  std::ifstream fileif;
+  std::unique_ptr< std::istream > filein;
   if (*tags_file == '-') {
     // use stdin
-    filein = &std::cin;
+    filein = std::unique_ptr< std::istream >(new zstr::istream(std::cin));
   } else {
-    fileif.open(tags_file, std::ifstream::in);
+    filein = std::unique_ptr< std::istream >(new zstr::ifstream(tags_file));
     // check if not read error
-    if (fileif.fail()) {
       std::cerr << "Error: Can't read "<< tags_file << std::endl;
       return 1;
-    }
-    filein = &fileif;
   }
   bool no_name = 1;
 
