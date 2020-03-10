@@ -664,7 +664,11 @@ int main (int argc, char *argv[]) {
     std::cout << "\ttag_names";
   if(!merge_counts) {
     for (uint32_t sample = 0; sample < nb_samples; ++sample) {
-      std::cout << "\t" << parse.nonOption(sample);
+      // keep basename for fastq filename
+      std::size_t found = std::string(parse.nonOption(sample)).find_last_of("/");
+      if (found == std::string::npos)
+        found = -1;      // set to the beginning if no path present
+      std::cout << "\t" << std::string(parse.nonOption(sample)).substr(found+1);
     }
   } else {
     std::cout << "\t" << merge_counts_colname;
