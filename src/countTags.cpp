@@ -225,7 +225,6 @@ public:
 int main (int argc, char *argv[]) {
   // Config vars
   const char * tags_file;
-  const char * seq_file;
   uint32_t tag_length = 22;
   bool isstranded = false;
   bool ispaired = false;
@@ -238,7 +237,7 @@ int main (int argc, char *argv[]) {
   std::string merge_counts_colname = "counts";
   uint32_t nb_tags = 0;
   uint32_t max_reads = UINT32_MAX;
-  int nb_threads = 1;
+//  int nb_threads = 1; // unused
   uint32_t nb_samples;
   uint32_t i;
   uint32_t read_id;
@@ -548,7 +547,7 @@ int main (int argc, char *argv[]) {
     std::cerr << "Write matched read in file\t" << (output_read.length() ? output_read : "None") << "\n";
   }
 //#pragma omp parallel num_threads(nb_threads)
-  for (int sample = 0; sample < nb_samples; ++sample) {
+  for (uint32_t sample = 0; sample < nb_samples; ++sample) {
     if (verbose > 1)
        std::cerr << "Counting tags for file: " << "\t" << parse.nonOption(sample) << "\n";
 
@@ -663,7 +662,7 @@ int main (int argc, char *argv[]) {
   if (print_tag_names)
     std::cout << "\ttag_names";
   if(!merge_counts) {
-    for (int sample = 0; sample < nb_samples; ++sample) {
+    for (uint32_t sample = 0; sample < nb_samples; ++sample) {
       std::cout << "\t" << parse.nonOption(sample);
     }
   } else {
@@ -680,12 +679,12 @@ int main (int argc, char *argv[]) {
       std::cout << "\t" << join(tags_names[it_counts->first],",");
     }
     if(!merge_counts){
-      for (int sample = 0; sample < nb_samples; ++sample) {
+      for (uint32_t sample = 0; sample < nb_samples; ++sample) {
         std::cout << "\t" << it_counts->second[sample];
       }
     } else {
       double count_sum = 0;
-      for (int sample = 0; sample < nb_samples; ++sample) {
+      for (uint32_t sample = 0; sample < nb_samples; ++sample) {
         count_sum += it_counts->second[sample];
       }
       std::cout << "\t" << count_sum;
@@ -697,7 +696,7 @@ int main (int argc, char *argv[]) {
   std::cerr << "# Total statistic per file\n";
   std::cerr << "File\t";
   if(!merge_counts) {
-    for (int sample = 0; sample < nb_samples; ++sample) {
+    for (uint32_t sample = 0; sample < nb_samples; ++sample) {
       std::cerr << "\t" << parse.nonOption(sample);
     }
   } else {
@@ -706,12 +705,12 @@ int main (int argc, char *argv[]) {
   std::cerr << "\n";
   std::cerr << "total_factors";
   if(!merge_counts) {
-    for (int sample = 0; sample < nb_samples; ++sample) {
+    for (uint32_t sample = 0; sample < nb_samples; ++sample) {
       std::cerr << "\t" << nb_factors_by_sample[sample];
     }
   } else {
     uint64_t nb_factors_sum = 0;
-    for (int sample = 0; sample < nb_samples; ++sample) {
+    for (uint32_t sample = 0; sample < nb_samples; ++sample) {
       nb_factors_sum += nb_factors_by_sample[sample];
     }
     std::cerr << "\t" << nb_factors_sum;
@@ -719,12 +718,12 @@ int main (int argc, char *argv[]) {
   std::cerr << std::endl;
   std::cerr << "total_reads";
   if(!merge_counts) {
-    for (int sample = 0; sample < nb_samples; ++sample) {
+    for (uint32_t sample = 0; sample < nb_samples; ++sample) {
       std::cerr << "\t" << nb_reads_by_sample[sample];
     }
   } else {
     uint64_t sum = 0;
-    for (int sample = 0; sample < nb_samples; ++sample) {
+    for (uint32_t sample = 0; sample < nb_samples; ++sample) {
       sum += nb_reads_by_sample[sample];
     }
     std::cerr << "\t" << sum;
