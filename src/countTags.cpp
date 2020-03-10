@@ -431,8 +431,11 @@ int main (int argc, char *argv[]) {
   } else {
     filein = std::unique_ptr< std::istream >(new zstr::ifstream(tags_file));
     // check if not read error
+    //filein.exceptions(std::ios_base::badbit);
+ /*   if (*filein.fail()) {
       std::cerr << "Error: Can't read "<< tags_file << std::endl;
       return 1;
+   }*/
   }
   bool no_name = 1;
 
