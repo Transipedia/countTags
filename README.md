@@ -14,10 +14,11 @@ You can use three tags format:
  * separator format : sequence name (the separator can be a space or a tabulation)
  * raw format : only the tag sequence
 
-Use option '-i' to specify the tag file
-You can provide the tags file via the standard input by using '-i -' as filename.
-If you file is gziped or using other compression format, uncrompress the file
-with the right and pass to countTags via the pipe and option '-i -'.
+You must use option '-i' to specify the tag file.  You can provide the tags
+file via the standard input by using '-i -' as filename.  If you file is
+gziped, you can pass directly to the '-i mytags.gz' option or the pipe if
+needed, but if it is in other compression format, uncompress the file with the
+right tool and pass to countTags via the pipe and option '-i -'.
 
 All tags must have at least the K-mer length, if too short, tags are discarded.
 The maximum authorize tag length is 32bp.

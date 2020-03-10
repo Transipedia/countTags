@@ -157,18 +157,18 @@ const option::Descriptor usage[] =
  */
   {UNKNOWN,      0, "" , "",
     option::Arg::None, "The purpose of countTags is to count occurences of few tags in large set of fastq files.\n\n"
-                       "USAGE: countTags [options] -i tags.file seq.fastq[.gz] ...\n"
+                       "USAGE: countTags [options] -i tags.file[.gz] seq.fastq[.gz] ...\n"
                        "\nVersion: " VERSION "\n"
                        "======\n"
                        " * Tags file format: fasta, tsv (tag[ \\t]name) or raw (tag)\n"
                        " * Use '-' for reading tags from STDIN\n"
-                       " * for now, countTags can't read tag file in gzip format, uncompress before and pass to countTags via a pipe (see example hereafter)\n"
+                       " * the file can be in gzip format, otherwise uncompress before and pass to countTags via a pipe (see example hereafter)\n"
                        "\nArguments:\n"
                        "========\n" },
   {UNKNOWN,      0, "", "",
     option::Arg::None, "Mandatory:" },
   {TAG_FILE, 0, "i","",
-    Arg::NonEmpty,     "  -i Tag_FileName      \ttag filename, or '-' for STDIN." },
+    Arg::NonEmpty,     "  -i Tag_FileName      \ttag filename, or '-' for STDIN ( gzip or not)." },
   {UNKNOWN,      0, "", "",
     option::Arg::None, "Options:" },
   {KMER_LENGTH, 0, "k","",
@@ -213,7 +213,8 @@ const option::Descriptor usage[] =
                        " * countTags -k 30 --stranded -t -i MyBestTags.tsv MyAllFastq*.gz > MyCount.tsv\n"
                        " * countTags -k 30 -i MyBestTags.tsv --paired rf  MyAllFastq_1.fastq.gz MyAllFastq_2.fastq.gz > MyCount.tsv\n"
                        " * countTags -k 30 -t -i - MyAllFastq*.gz < MyBestTags.raw\n"
-                       " * zcat MyBestTags.raw.gz | countTags -k 30 -t -i - --summary mystats.summary MyAllFastq*.gz > MyCount_table.tsv\n"
+                       " * countTags -k 30 -t -i MyBestTags.raw.gz --summary mystats.summary MyAllFastq*.gz > MyCount_table.tsv\n"
+                       " * bzcat MyBestTags.raw.bz | countTags -k 30 -t -i - --summary mystats.summary MyAllFastq*.gz > MyCount_table.tsv\n"
                        },
   {0,0,0,0,0,0}
 };
