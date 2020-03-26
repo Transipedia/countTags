@@ -188,7 +188,7 @@ const option::Descriptor usage[] =
   {NORMALIZE,    0, "n" , "normalize",
     Arg::None, "  -n|--normalize  \tnormalize count on total of million of kmer present in each sample." },
   {BILLIONOPT,    0, "b" , "kbpnormalize",
-    Arg::None, "  -b|--kbp \tnormalize count by billion of kmer instead of million (impliy -n|--normalize)." },
+    Arg::None, "  -b|--kbp \tnormalize count by billion of kmer instead of million (imply -n|--normalize)." },
   {TAG_NAMES,    0, "t", "tag-names",
     Arg::None, "  -t|--tag-names  \tprint tag names in the output." },
   {MERGE_COUNTS, 0,"" , "merge-counts",
