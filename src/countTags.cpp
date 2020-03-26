@@ -194,7 +194,7 @@ const option::Descriptor usage[] =
   {MERGE_COUNTS, 0,"" , "merge-counts",
     Arg::None, "  --merge-counts  \tmerge counts from all input FASTQs" },
   {MERGE_COUNTS_COLNAME,    0,"" , "merge-counts-colname",
-    Arg::NonEmpty, "  --merge-counts-colname  \tcolumn name when merge counts is used" },
+    Arg::NonEmpty, "  --merge-counts-colname  \tcolumn name when merge counts is used (imply --merge-count)" },
   {READS_WRFILE, 0, "r","reads",
     Arg::NonEmpty,     "  -r|--reads fileName      \twrite reads matching kmer in a fileName (for now store tag and read only, it's not a fastq file" },
   {SUMMARY,    0,"" , "summary",
@@ -370,12 +370,15 @@ int main (int argc, char *argv[]) {
 
   if (options[MERGE_COUNTS]) {
     merge_counts = true;
-    if (options[MERGE_COUNTS_COLNAME]) {
-      if (verbose>2) {
-        std::cerr << "\tColumn name when merging:" << options[MERGE_COUNTS_COLNAME].arg << "\n";
-      }
-      merge_counts_colname = options[MERGE_COUNTS_COLNAME].arg;
+  }
+  if (options[MERGE_COUNTS_COLNAME]) {
+    // can use only --merge-counts-colname option
+    // but set merge_counts to use only one colname
+    merge_counts = true;
+    if (verbose>2) {
+      std::cerr << "\tColumn name when merging:" << options[MERGE_COUNTS_COLNAME].arg << "\n";
     }
+    merge_counts_colname = options[MERGE_COUNTS_COLNAME].arg;
   }
 
   if (options[READS_WRFILE].count()) {
