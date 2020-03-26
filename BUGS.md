@@ -1,3 +1,5 @@
+# [X] 20200326-01 : Do not normalize count
+
 # [ ] 20190930-01 : mergeTagCounts do not manage tag name in file
 
 # [X] 20180625-01 : Do not manage paired fastq files in stranded mode

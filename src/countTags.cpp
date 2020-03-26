@@ -638,16 +638,16 @@ int main (int argc, char *argv[]) {
     nb_factors_by_sample.push_back(nb_factors);
     nb_reads_by_sample.push_back(line_id);
 
-//    if(normalize && nb_factors > 0) {
-//      if (verbose > 1 )
-//        std::cerr << "Normalize counts" << std::endl;
-//      for (it_counts=tags_counts.begin(); it_counts!=tags_counts.end(); ++it_counts) {
-//        // TODO We should take into accout the error rate...
-//        if(it_counts->second[sample] > 0) {
-//          it_counts->second[sample] = it_counts->second[sample] * normalize_factors / nb_factors;
-//        }
-//      }
-//    }
+    if(normalize && nb_factors > 0) {
+      if (verbose > 1 )
+        std::cerr << "Normalize counts" << std::endl;
+      for (it_counts=tags_counts.begin(); it_counts!=tags_counts.end(); ++it_counts) {
+        // TODO We should take into accout the error rate...
+        if(it_counts->second[sample] > 0) {
+          it_counts->second[sample] = it_counts->second[sample] * normalize_factors / nb_factors;
+        }
+      }
+    }
 
     // Close file and clear line buffer
     pclose(file);
