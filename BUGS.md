@@ -1,4 +1,5 @@
 # [X] 20200326-01 : Do not normalize count
+ * the code was commented !!! (commit 1adf838c)
 
 # [ ] 20190930-01 : mergeTagCounts do not manage tag name in file
 
