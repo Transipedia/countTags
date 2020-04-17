@@ -225,29 +225,31 @@ public:
 };
 
 int main (int argc, char *argv[]) {
-  // Config vars
-  const char * tags_file;
-  uint32_t tag_length = 22;
-  bool isstranded = false;
-  bool ispaired = false;
-  bool doalltags = false;               // switch for alltags option
-  std::string paired;
-  bool normalize = false;
-  double normalize_factors;             // normalize factor MILLION or BILLION
-  bool print_tag_names = false;
-  bool merge_counts = false;
-  std::string merge_counts_colname = "counts";
-  uint32_t nb_tags = 0;
-  uint32_t max_reads = UINT32_MAX;
-//  int nb_threads = 1; // unused
-  uint32_t nb_samples;
+
+  // Options vars
+  int verbose = 0;                               // --verbose: verbose level
+  uint32_t tag_length = 22;                      // -k: default kmer length
+  uint32_t max_reads = UINT32_MAX;               // --maxreads: max number of reads to analyze
+//int nb_threads = 1;                            // --threads: unused
+  bool isstranded = false;                       // --stranded: is data stranded
+  bool ispaired = false;                         // --paired: is data paired
+  std::string paired = "rf";                     // store paired format ([rf], fr, ff)
+  bool doalltags = false;                        // --alltags: generated all tags from sequence
+  bool normalize = false;                        // --normalize: switch to normalize count
+  double normalize_factors;                      // normalize factor MILLION or BILLION
+  bool print_tag_names = false;                  // --tag-names: print tag name in sdtout
+  bool merge_counts = false;                     // --merge-counts: merge all count in one column
+  std::string merge_counts_colname = "counts";   // --merge-counts-colname: colname for merged column
+  std::string output_read;                       // --reads: filename to output read matching kmer
+  std::string summary_file;                      // --summary: store summary information in a filename
+  uint32_t nb_samples = 0;                       // number of fastq file on argument line
+  const char * tags_file;                        // -i: mandatory, tag filename
+
   uint32_t i;
   uint32_t read_id;
 
   char * seq;
   std::string tag_name;
-  std::string output_read; // store filename to output read matching kmer
-  std::string summary_file; // store summary information in a filename
   uint32_t seq_length;
   uint64_t tag;
   uint64_t valrev,valfwd;
@@ -274,7 +276,6 @@ int main (int argc, char *argv[]) {
    *        Parsing options
    *
    *********************************/
-  int verbose = 0; // verbose level
 
   argc-=(argc>0); argv+=(argc>0); // skip program name argv[0] if present
   option::Stats  stats(usage, argc, argv);
@@ -318,6 +319,7 @@ int main (int argc, char *argv[]) {
     }
   }
 
+  // Maximun reads to analyze
   if (options[MAX_READS]) {
     max_reads = atoi(options[MAX_READS].arg);
   }
@@ -326,10 +328,12 @@ int main (int argc, char *argv[]) {
   //  nb_threads = atoi(options[NB_THREADS].arg);
   //}
 
+  // Are data stranded ?
   if (options[STRANDED]) {
     isstranded = true;
   }
 
+  // Are data paired ?
   if (options[PAIRED]) {
     // turn ON paired option
     ispaired = true;
@@ -345,32 +349,40 @@ int main (int argc, char *argv[]) {
     }
   }
 
+  // Data are nostranded, turn off ispaired and isstranded
   if (options[NOSTRANDED]) {
     isstranded = false;
     ispaired = false;
   }
 
+  // Analyze all tags=kmer from the sequence
+  // Generate all tags from submited sequences
   if (options[ALLTAGS]) {
     doalltags = true;
   }
 
+  // We normalize count to million
   if (options[NORMALIZE]) {
     normalize = true;
     normalize_factors = MILLION;
   }
 
+  // We normalize count to billion
   if (options[BILLIONOPT]) {
     normalize = true;
     normalize_factors = BILLION;
   }
 
+  // Tag names are print in stdout
   if (options[TAG_NAMES]) {
     print_tag_names = true;
   }
 
+  // We merge all count in one column
   if (options[MERGE_COUNTS]) {
     merge_counts = true;
   }
+  // Give a name to the merged column instead of 'counts'
   if (options[MERGE_COUNTS_COLNAME]) {
     // can use only --merge-counts-colname option
     // but set merge_counts to use only one colname
@@ -381,16 +393,19 @@ int main (int argc, char *argv[]) {
     merge_counts_colname = options[MERGE_COUNTS_COLNAME].arg;
   }
 
+  // Write reads matching a kmer in a file
   if (options[READS_WRFILE].count()) {
     output_read = options[READS_WRFILE].arg;
   }
 
+  // output the summary in a file
   if (options[SUMMARY].count()) {
     summary_file = options[SUMMARY].arg;
     // turn verbose to 1 at least
     verbose = verbose ? verbose++ : 1;
   }
 
+  // Print help for unknown option
   if (options[UNKNOWN]) {
     for (option::Option* opt = options[UNKNOWN]; opt; opt = opt->next())
         std::cerr << "Unknown option: " << opt->name << "\n";
@@ -398,21 +413,24 @@ int main (int argc, char *argv[]) {
     return 1;
   }
 
+  // Need at least one fastq file on argument line
   if(parse.nonOptionsCount() < 1) {
     std::cerr << "No fastq file provided ?" << "\n";
     option::printUsage(std::cerr, usage);
     return 0;
   }
-
-  tags_file = options[TAG_FILE].arg;
+  // We have fastq, store number of element in argument line = nb samples
   nb_samples = parse.nonOptionsCount();
 
+  // Tag filename is require, so is always defined here
+  tags_file = options[TAG_FILE].arg;
+
+  // print info for verbose
   if (verbose>2) {
     std::cerr <<  "Version: " << VERSION << std::endl;
     std::cerr << "File to analyse: " << std::to_string(parse.nonOptionsCount()) << std::endl;
     for (int i = 0; i < parse.nonOptionsCount(); ++i)
       fprintf(stderr, "Non-option argument #%d is %s\n", i, parse.nonOption(i));
-
   }
 
   /**********************************
