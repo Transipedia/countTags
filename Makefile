@@ -13,6 +13,7 @@ OBJECTS		= $(addprefix $(SRC_DIR)/,$(OBJ_FILES:.cpp=.o))
 VERSION := $(shell git describe --tags --always | sed 's/countTags\///')
 
 all: $(addprefix $(BIN_DIR)/, $(MAIN_FILES:.cpp=))
+	bin/countTags -V
 
 clean:
 	rm -f $(OBJECTS)
