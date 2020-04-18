@@ -55,13 +55,13 @@
 
 //return the minumum value of the k-mer at pos p between strand rev and stran fwd
 //TODO add a function that get a DNA string and a k value, and return a array of vector values
-inline uint64_t valns(uint32_t p, char *dna,uint32_t k,int64_t *last,uint64_t *valfwd,uint64_t *valrev, bool isstranded = false, bool getrev = false){
+inline uint64_t valns(uint32_t p, char *dna, uint32_t k, int64_t *last, uint64_t *valfwd, uint64_t *valrev, bool isstranded = false, bool getrev = false){
   int e=p-*last;
-  if(e!=1){
+  if (e!=1){
     *last=p;
     *valfwd=DNAtoInt(&dna[p], k, true);
     *valrev=intRevcomp(*valfwd, k);
-  }else{
+  } else{
     // Compute the new value from the previous one.
     uint64_t m=1;
     *valfwd%=m<<(2*k-2);
@@ -76,7 +76,7 @@ inline uint64_t valns(uint32_t p, char *dna,uint32_t k,int64_t *last,uint64_t *v
   if (getrev)
     return *valrev;
   // otherwise
-  if(isstranded || *valfwd < *valrev) {
+  if (isstranded || *valfwd < *valrev) {
     return *valfwd;
   } else {
     return *valrev;
@@ -270,10 +270,9 @@ int main (int argc, char *argv[]) {
   ssize_t read;
   uint32_t line_id = 0;
 
-
   /**********************************
    *
-   *        Parsing options
+   *     Parsing options
    *
    *********************************/
 
@@ -435,7 +434,9 @@ int main (int argc, char *argv[]) {
 
   /**********************************
    *
-   *   Create tags counting table
+   *    Variables
+   *
+   *********************************/
    *
    *********************************/
   line_id = 0;
@@ -633,16 +634,17 @@ int main (int argc, char *argv[]) {
         //uint64_t valrev,valfwd;
         last = -3;
 
-        for(i = 0; i < nb_tags; i++) {
+        for (uint32_t i = 0; i < nb_tags; i++) {
           it_counts = tags_counts.find(valns(i, seq, tag_length, &last, &valfwd, &valrev, isstranded, getrev));
-          if(it_counts != tags_counts.end()) {
+          // did we find a tag in the seq
+          if (it_counts != tags_counts.end()) {
             it_counts->second[sample]++;
             // output read in a file if required
             // TODO: move new before loop, to avoid creation each time when option is on
             if (output_read.length()) {
               char *tag_seq = new char[tag_length+1];
               tag_seq[tag_length] = '\0';
-                intToDNA(it_counts->first, tag_length,tag_seq);
+                intToDNA(it_counts->first, tag_length, tag_seq);
                 hfile_read << tag_seq;
                 if(print_tag_names) {
                   hfile_read << "\t" << join(tags_names[it_counts->first], ",");
@@ -659,12 +661,12 @@ int main (int argc, char *argv[]) {
     nb_factors_by_sample.push_back(nb_factors);
     nb_reads_by_sample.push_back(line_id);
 
-    if(normalize && nb_factors > 0) {
+    if (normalize && nb_factors > 0) {
       if (verbose > 1 )
         std::cerr << "Normalize counts" << std::endl;
       for (it_counts=tags_counts.begin(); it_counts!=tags_counts.end(); ++it_counts) {
         // TODO We should take into accout the error rate...
-        if(it_counts->second[sample] > 0) {
+        if (it_counts->second[sample] > 0) {
           it_counts->second[sample] = it_counts->second[sample] * normalize_factors / nb_factors;
         }
       }
@@ -676,9 +678,12 @@ int main (int argc, char *argv[]) {
       free(line);
   }
 
-  /****
-   * PRINT THE RESULTS
-   */
+  /**********************************
+   *
+   *     PRINT THE RESULTS
+   *
+   *********************************/
+
   // First print headers
   std::cout << "tag";
   if (print_tag_names)

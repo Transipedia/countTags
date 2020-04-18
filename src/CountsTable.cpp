@@ -57,7 +57,7 @@ uint32_t CountsTable::getCount(const char *kmer, uint sample_id) {
 uint32_t CountsTable::getCount(uint64_t kmer, uint sample_id) {
   std::unordered_map<uint64_t,uint32_t*>::iterator it_counts = tags_counts.find(kmer);
   // If the tag is already in the hash, we set the count for this->sample
-  if(it_counts != tags_counts.end()) {
+  if (it_counts != tags_counts.end()) {
     return it_counts->second[sample_id];
   } else {
     return 0;
@@ -72,7 +72,7 @@ void CountsTable::setCount(const char *kmer, uint sample_id, uint value) {
 void CountsTable::setCount(uint64_t kmer, uint sample_id, uint value) {
   std::unordered_map<uint64_t,uint32_t*>::iterator it_counts = tags_counts.find(kmer);
   // If the tag is already in the hash, we set the count for this->sample
-  if(it_counts != tags_counts.end()) {
+  if (it_counts != tags_counts.end()) {
     it_counts->second[sample_id] = value;
   // Otherwise we create a new entry
   } else {
@@ -94,14 +94,14 @@ void CountsTable::incrementCount(uint64_t kmer, uint sample_id, uint value) {
 
 void CountsTable::recurrencyFilter(uint recurrency_threshold) {
   std::unordered_map<uint64_t,uint32_t*>::iterator it_counts = this->tags_counts.begin();
-  while(it_counts != this->tags_counts.end()) {
+  while (it_counts != this->tags_counts.end()) {
     uint recurrency = 0;
     for (int s = 0; s < this->nb_samples; ++s) {
-      if(it_counts->second[s] > 0) {
+      if (it_counts->second[s] > 0) {
         recurrency++;
       }
     }
-    if(recurrency >= recurrency_threshold) {
+    if (recurrency >= recurrency_threshold) {
       it_counts++;
     } else {
       it_counts = this->tags_counts.erase(it_counts);

@@ -93,7 +93,7 @@ inline uint64_t intRevcomp(uint64_t factor, uint32_t length) {
   mask_lsb = 3;
   uint64_t shift = 0;
   uint64_t result=0;
-  for(uint32_t j(0);j<length;j++){
+  for (uint32_t j(0);j<length;j++){
     result <<= 2;
     // get the leftmost nucleotide and put it at the end
     result |= (factor & mask_lsb) >> shift;
@@ -112,9 +112,9 @@ inline uint64_t DNAtoInt(const char *dna, uint32_t dna_length, bool stranded = f
   }
   // If the conversion is not "strand-specific" we calculate the reverse DNA it
   // and return the one that has the smallest value
-  if(!stranded) {
+  if (!stranded) {
     uint64_t rev_comp = intRevcomp(dna_int,dna_length);
-    if(rev_comp < dna_int) {
+    if (rev_comp < dna_int) {
       return rev_comp;
     }
   }
