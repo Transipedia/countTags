@@ -245,31 +245,6 @@ int main (int argc, char *argv[]) {
   uint32_t nb_samples = 0;                       // number of fastq file on argument line
   const char * tags_file;                        // -i: mandatory, tag filename
 
-  uint32_t i;
-  uint32_t read_id;
-
-  char * seq;
-  std::string tag_name;
-  uint32_t seq_length;
-  uint64_t tag;
-  uint64_t valrev,valfwd;
-  uint64_t nb_factors;
-  int64_t last;
-  std::unordered_map<uint64_t,double*>  tags_counts;
-  std::unordered_map<uint64_t,std::vector<std::string>> tags_names;
-  std::unordered_map<uint64_t,double*>::iterator it_counts;
-  std::vector<uint64_t> nb_factors_by_sample;
-  std::vector<uint64_t> nb_reads_by_sample;
-
-  // File vars
-  std::string gzip_pipe = "gunzip -fc ";
-  std::string tmp;
-  FILE * file;
-  char * line = NULL;
-  size_t len = 0;
-  ssize_t read;
-  uint32_t line_id = 0;
-
   /**********************************
    *
    *     Parsing options
@@ -437,17 +412,40 @@ int main (int argc, char *argv[]) {
    *    Variables
    *
    *********************************/
+
+  uint32_t line_id = 0;                          // store number of line read
+  uint32_t nb_tags = 0;                          // store number of tags read
+  uint64_t tag;                                  // tag int converted from sequence
+
+  // hash table of vector to store tag+count
+  std::unordered_map<uint64_t,double*> tags_counts;
+  // iterators for tags_counts
+  std::unordered_map<uint64_t,double*>::iterator it_counts;
+  // hash table to store tag_name
+  std::unordered_map<uint64_t,std::vector<std::string>> tags_names;
+  // vector to store nb factors = kmer per sample
+  std::vector<uint64_t> nb_factors_by_sample;
+  // vector to store nv reads per sample
+  std::vector<uint64_t> nb_reads_by_sample;
+
+  std::ofstream hfile_summary;                   // file handle to write summary
+
+  /**********************************
+   *
+   *     Create hash tags count table
    *
    *********************************/
-  line_id = 0;
+
+  // local vars
+  bool no_name = 1;                              // do we find a tag_name
+  std::string tag_name;                          // store tag_name read or generated
+  std::unique_ptr< std::istream > filein;        // filehandle for tag file
 
   if (verbose > 1)
     std::cerr << "Counting k-mers" << std::endl;
-  // Create hash table of k-mer counts
-  line_id = 0;
-  nb_tags = 0;
 
-  std::unique_ptr< std::istream > filein;
+  // read tags from stdin or file with zstr stream,
+  // which manage if gz or not
   if (*tags_file == '-') {
     // use stdin
     filein = std::unique_ptr< std::istream >(new zstr::istream(std::cin));
@@ -460,7 +458,6 @@ int main (int argc, char *argv[]) {
       return 1;
    }*/
   }
-  bool no_name = 1;
 
   // Parse file and detect file format (fas, raw or tsv)
   for (std::string lines; std::getline(*filein, lines); ) {
@@ -485,7 +482,7 @@ int main (int argc, char *argv[]) {
       // Take at least tag_length for each tags
       if (lines.length() < tag_length) {
         std::cerr << "Error: tag lower than kmer: " << lines << std::endl;
-        continue;
+        continue;                                // go to next tag
       }
       // convert tag to Int
       uint32_t max_kmer_toread = 1;    // at least we get the first kmer
@@ -499,7 +496,9 @@ int main (int argc, char *argv[]) {
         tag = DNAtoInt(lines.substr(i, tag_length).c_str(), tag_length, isstranded);
         if (verbose>2)
           std::cerr << "tag: " << lines.substr(i, tag_length) << ", name:" << tag_name << ", tag nb: " << i << ", tagInt: " << tag;
+        // Create vector for each tag
         tags_counts[tag] = new double[nb_samples]();
+        // Add tag_name or tag_name.kmer if take all tags from sequence
         if (! doalltags)
           tags_names[tag].push_back(tag_name);
         else {
@@ -514,7 +513,7 @@ int main (int argc, char *argv[]) {
     line_id++;
   }
 
-  // Bug: didn't test if tag file is empty
+  // We test that tag file is not empty
   if (line_id == 0) {
     std::cerr << "I did not get or understand your tag sequences" << std::endl;
     exit(2);
@@ -523,26 +522,27 @@ int main (int argc, char *argv[]) {
    if (verbose > 1)
      std::cerr << "Finished indexing tags" << std::endl;
 
-
   /**********************************
    *
-   *            First pass
+   *       Count kmer in fastq
    *
    *********************************/
 
-  // open file tp output reads matching kmer
-  std::ofstream hfile_read;
+  // local vars
+  std::ofstream hfile_read;                      // file handle to write read of matching kmer
+  std::string gzip_pipe = "gunzip -fc ";         // string to do pipe easily to decrompress fastq.gz file
+
+  // open file to output reads matching kmer
   if (output_read.length()) {
     hfile_read.open(output_read, std::ifstream::out);
     // check if not write error
     if (hfile_read.fail()) {
-      std::cerr << "Error: Can't write to read file "<< output_read << std::endl;
+      std::cerr << "Error: Can't write read matching kmer in file "<< output_read << std::endl;
       return 1;
     }
   }
 
   // open file tp output summary information
-  std::ofstream hfile_summary;
   if (summary_file.length()) {
     hfile_summary.open(summary_file, std::ifstream::out);
     // check if not write error
@@ -553,6 +553,7 @@ int main (int argc, char *argv[]) {
     // send cerr to hfile_summary;
     std::cerr.rdbuf(hfile_summary.rdbuf());
   }
+
   // print arguments use to summary file
   if (verbose) {
     std::cerr << "CountTags version\t" << VERSION << "\n";
@@ -569,15 +570,34 @@ int main (int argc, char *argv[]) {
     std::cerr << "Merge count\t" << (merge_counts ? "Yes" : "No") << "\n";
     std::cerr << "Write matched read in file\t" << (output_read.length() ? output_read : "None") << "\n";
   }
+
+  // Read the fastq
 //#pragma omp parallel num_threads(nb_threads)
   for (uint32_t sample = 0; sample < nb_samples; ++sample) {
     if (verbose > 1)
        std::cerr << "Counting tags for file: " << "\t" << parse.nonOption(sample) << "\n";
 
-    line = NULL;
-    len = 0;
-    line_id = 0;
-    tmp = "";
+    // local vars specific to each sample
+    FILE * hfastq;                               // handle to fastq file
+    uint32_t seq_length = 0;                     // length of the read
+    uint32_t read_id = 0;                        // number of read analyzed
+    char * seq;
+
+    // use c funtionc getline which allocate memory if line=NULL & len=0,
+    // line has to be freed at the end
+    char * line = NULL;                          // char* to each line read in hfastq
+    size_t len = 0;                              // length of buffer line read by getline
+    ssize_t read;                                // length of line read by getline, include \0
+    line_id = 0;                                 // store number of line read in hfastq
+
+
+    uint64_t nb_factors = 0;                     // number of factors = kmer in a sample
+    // values to DNAtoInt
+    uint64_t valrev = 0;
+    uint64_t valfwd = 0;
+    int64_t last = 0;
+    std::string cmdline = "";                    // command line to pass to pipe via popen
+
     // Test if fastq file is present, otherwise exit with error 10
     std::ifstream testfile(parse.nonOption(sample));
     if (!testfile.good()) {
@@ -586,11 +606,10 @@ int main (int argc, char *argv[]) {
     }
 
     // open file via pipe, so using another thread to gunzip the file
-    file = popen(tmp.append(gzip_pipe).append(parse.nonOption(sample)).c_str(), "r");
-    nb_factors = 0;
+    hfastq = popen(cmdline.append(gzip_pipe).append(parse.nonOption(sample)).c_str(), "r");
 
     // ispaired: have to get reverse complement for reverse pair
-    // use getrev to get the reverse complement when rf/fr/ff
+    // use bool getrev to get the reverse complement when rf/fr/ff
     bool getrev = false;
 
     if (ispaired) {
@@ -609,11 +628,12 @@ int main (int argc, char *argv[]) {
     if (verbose > 2)
       std::cerr << "Paired mode ON, getrev = " << std::to_string(getrev) << ", for file " << parse.nonOption(sample) << std::endl;
 
-    while ((read = getline(&line, &len, file)) != -1) {
+    while ((read = getline(&line, &len, hfastq)) != -1) {
       // If this line is a sequence
-      if(line_id % 4 == 1) {
+      if (line_id % 4 == 1) {
+        // how many read are analyzed
         read_id = ((int)((double)line_id*0.25) + 1);
-        if(read_id >= max_reads) {
+        if (read_id >= max_reads) {
           break;
         }
         // Print a user-friendly output on STDERR every each XXXX reads processed
@@ -622,16 +642,14 @@ int main (int argc, char *argv[]) {
         }
         // set seq to line
         seq = line;
-        seq_length = strlen(seq) - 1; // Minus 1 because we have a new line
+        seq_length = strlen(seq) - 1; // Minus 1 because we have a new line character
 
         // Skip the sequence if the read length is < to the tag_length
-        if(seq_length < tag_length)
+        if (seq_length < tag_length)
           continue;
 
         nb_tags = seq_length - tag_length + 1;
         nb_factors += nb_tags;
-
-        //uint64_t valrev,valfwd;
         last = -3;
 
         for (uint32_t i = 0; i < nb_tags; i++) {
@@ -655,7 +673,7 @@ int main (int argc, char *argv[]) {
         }
       }
       line_id++;
-    }
+    }                                            // end of while reading hfastq file
 
     // store statistic
     nb_factors_by_sample.push_back(nb_factors);
@@ -673,10 +691,10 @@ int main (int argc, char *argv[]) {
     }
 
     // Close file and clear line buffer
-    pclose(file);
+    pclose(hfastq);
     if (line)
       free(line);
-  }
+  }                                              // end of for each sample
 
   /**********************************
    *
