@@ -1,0 +1,4 @@
+tag	tag_names	../test_1.fastq.gz	../test_2.fastq.gz
+AAAAAAAAAAAGGTGTGGTGGTCCAGTTGAAGAAA2	LongNotMatchingTag	0	0
+AAAAAAAAAAATTAGGACGAGTCATGCTCTCCAAA2	LongMatchingTag	0	0
+total_factors	*	670000	670000

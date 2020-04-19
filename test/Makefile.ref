@@ -3,7 +3,7 @@ ofile=output_test
 jf=/tmp/test_jellyfish_count.jf
 jfcount=/tmp/jfcount.txt
 okfile=TAGS_test
-countTagsReference=countTags-v0.3.3
+countTagsReference=countTags-v0.4.5
 
 # color for bash
 RED='\033[0;31m'
