@@ -412,7 +412,6 @@ int main (int argc, char *argv[]) {
    *
    *********************************/
 
-  uint32_t line_id = 0;                          // store number of line read
   uint32_t nb_tags = 0;                          // store number of tags read
   uint64_t tag;                                  // tag int converted from sequence
 
@@ -439,6 +438,7 @@ int main (int argc, char *argv[]) {
   bool no_name = 1;                              // do we find a tag_name
   std::string tag_name;                          // store tag_name read or generated
   std::unique_ptr< std::istream > filein;        // filehandle for tag file
+  uint32_t nline_tag = 0;                        // store number of line read in tag_file
 
   if (verbose > 1)
     std::cerr << "Counting k-mers" << std::endl;
@@ -511,11 +511,11 @@ int main (int argc, char *argv[]) {
       if (verbose>2)
        std::cerr << ", nb_tag: " << nb_tags << std::endl;
     }
-    line_id++;
+    nline_tag++;
   }
 
   // We test that tag file is not empty
-  if (line_id == 0) {
+  if (nline_tag == 0) {
     std::cerr << "I did not get or understand your tag sequences" << std::endl;
     exit(2);
   }
@@ -588,7 +588,7 @@ int main (int argc, char *argv[]) {
     char * line = NULL;                          // char* to each line read in hfastq
     size_t len = 0;                              // length of buffer line read by getline
     ssize_t linelen;                             // length of line read by getline, include \0
-    line_id = 0;                                 // store number of line read in hfastq
+    uint32_t nline_read = 0;                     // store number of line read in hfastq
 
 
     uint64_t nb_factors = 0;                     // number of factors = kmer in a sample
@@ -630,9 +630,9 @@ int main (int argc, char *argv[]) {
 
     while ((linelen = getline(&line, &len, hfastq)) != -1) {
       // If this line is a sequence
-      if (line_id % 4 == 1) {
+      if (nline_read % 4 == 1) {
         // how many read are analyzed
-        nread = ((int)((double)line_id*0.25) + 1);
+        nread = ((int)((double)nline_read*0.25) + 1);
         if (nread >= max_reads) {
           break;
         }
@@ -670,7 +670,7 @@ int main (int argc, char *argv[]) {
           }
         }
       }
-      line_id++;
+      nline_read++;
     }                                            // end of while reading hfastq file
 
     // store statistic
