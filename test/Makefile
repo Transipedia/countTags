@@ -3,22 +3,22 @@ include Makefile.ref
 all: test_ok test_error_parsing test_stranded
 
 test_ok:
-	@echo "$(RED)Test everything is fine:$(NoColor)"
+	@echo "$(PURPLE)Test everything is fine:$(NoColor)"
 	@echo "$(PURPLE)# test with tag-names$(NoColor)"
 	@for f in fas tsv csv; do ../bin/countTags --tag-names -k 30 -i $(okfile).$$f test_?.fastq.gz | sort > /tmp/$(ofile)_names_$${f}_ok.txt; done
-	for i in /tmp/$(ofile)_names_*_ok.txt; do echo "$(GREEN)$$i$(NoColor)"; diff $$i ok/$(ofile)_with_names_ok.txt;done
+	for i in /tmp/$(ofile)_names_*_ok.txt; do echo "$(BROWNBG)$$i$(NoColor):"; diff $$i ok/$(ofile)_with_names_ok.txt; if [ $$? -eq 0 ]; then echo "$(GREEN)ok$(NoColor)"; else echo "$(RED)ERROR$(NoColor)"; fi;done
 	@echo "$(PURPLE)# test without tag-names$(NoColor)"
 	@for f in fas tsv csv raw; do ../bin/countTags -k 30 -i $(okfile).$$f test_?.fastq.gz | sort > /tmp/$(ofile)_without_$${f}_ok.txt; done
-	for i in /tmp/$(ofile)_without_*.txt; do echo $i; diff $$i ok/$(ofile)_without_names_ok.txt;done
+	for i in /tmp/$(ofile)_without_*.txt; do echo "$(BROWNBG)$$i$(NoColor):"; diff $$i ok/$(ofile)_without_names_ok.txt; if [ $$? -eq 0 ]; then echo "$(GREEN)ok$(NoColor)"; else echo "$(RED)ERROR$(NoColor)"; fi;done
 
 test_error_parsing:
-	@echo "$(RED)Test error in parsing argument:$(NoColor)"
+	@echo "$(PURPLE)Test error in parsing argument:$(NoColor)"
 	../bin/countTags --tags_names --tag-format 2 -k 30 -m 10 $(okfile).raw test_?.fastq.gz
 
 test_stranded:
-	@echo "$(RED)Test with stranded option:$(NoColor)"
-	for i in /tmp/$(ofile)_names_*_okstranded.txt; do echo "$(GREEN)$$i$(NoColor)"; diff $$i stranded/$(ofile)_with_names_ok.txt;done
+	@echo "$(PURPLE)Test with stranded option:$(NoColor)"
 	for f in fas tsv csv; do ../bin/countTags --tag-names -k 30 --stranded -i $(okfile).$$f test_?.fastq.gz | sort > /tmp/$(ofile)_names_$${f}_okstranded.txt; done
+	for i in /tmp/$(ofile)_names_*_okstranded.txt; do echo "$(BROWNBG)$$i$(NoColor)"; diff $$i stranded/$(ofile)_with_names_ok.txt; if [ $$? -eq 0 ]; then echo "$(GREEN)ok$(NoColor)"; else echo "$(RED)ERROR$(NoColor)"; fi;done
 
 init:
 	rm -f $(okfile).*
@@ -35,9 +35,9 @@ init:
 	cat TAGS_test_supl.csv >> $(okfile).csv
 
 	# Add shorter tags than 30; should not be analyse
-	tail -n +5 $(okfile).csv | head -4 | cut -c 1-15 | perl -p -e 'BEGIN {$$i=1};$$j=$$i++;s/\n/ shok.$$j\n/'>> $(okfile).csv
+	tail -n +5 $(okfile).csv | head -4 | cut -c 1-15 | perl -p -e 'BEGIN {$$i=1};$$j=$$i++;s/\n/ shok.$$j\n/' >> $(okfile).csv
 	# Add scramble shorter tags than 30; should not be analyse
-	tail -n +5 $(okfile).csv | head -4 | cut -c 1-15 | tr 'A' 'G' | perl -p -e 'BEGIN {$$i=1};$$j=$$i++;s/\n/ shbad.$$j\n/'>> $(okfile).csv
+	tail -n +5 $(okfile).csv | head -4 | cut -c 1-15 | tr 'A' 'G' | perl -p -e 'BEGIN {$$i=1};$$j=$$i++;s/\n/ shbad.$$j\n/' >> $(okfile).csv
 	# Create tsv file format
 	cat $(okfile).csv | sed 's/ /\t/' > $(okfile).tsv
 	# Create fasta file format
