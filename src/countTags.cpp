@@ -446,17 +446,18 @@ int main (int argc, char *argv[]) {
 
   // read tags from stdin or file with zstr stream,
   // which manage if gz or not
-  if (*tags_file == '-') {
-    // use stdin
-    filein = std::unique_ptr< std::istream >(new zstr::istream(std::cin));
-  } else {
-    filein = std::unique_ptr< std::istream >(new zstr::ifstream(tags_file));
-    // check if not read error
-    //filein.exceptions(std::ios_base::badbit);
- /*   if (*filein.fail()) {
-      std::cerr << "Error: Can't read "<< tags_file << std::endl;
-      return 1;
-   }*/
+  try {
+    if (*tags_file == '-') {
+      // use stdin
+      filein = std::unique_ptr< std::istream >(new zstr::istream(std::cin));
+    } else {
+      filein = std::unique_ptr< std::istream >(new zstr::ifstream(tags_file));
+    }
+  }
+  // check if no read error, catch all exceptions
+  catch (...){
+    std::cerr << "Error: Can't read "<< tags_file << std::endl;
+    exit(10);
   }
 
   // Parse file and detect file format (fas, raw or tsv)
@@ -602,7 +603,7 @@ int main (int argc, char *argv[]) {
     std::ifstream testfile(parse.nonOption(sample));
     if (!testfile.good()) {
       std::cerr << "Error: Can't read fastq file " << parse.nonOption(sample) << std::endl;
-      return 10;
+      exit(10);
     }
 
     // open file via pipe, so using another thread to gunzip the file
