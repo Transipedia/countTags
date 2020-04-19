@@ -163,7 +163,7 @@ const option::Descriptor usage[] =
                        "USAGE: countTags [options] -i tags.file[.gz] seq.fastq[.gz] ...\n"
                        "\nVersion: " VERSION "\n"
                        "======\n"
-                       " * Tags file format: fasta, tsv (tag[ \\t]name) or raw (tag)\n"
+                       " * Tags file format: fasta, tsv (tag[ \\t,;]name) or raw (tag)\n"
                        " * Use '-' for reading tags from STDIN\n"
                        " * the file can be in gzip format, otherwise uncompress before and pass to countTags via a pipe (see example hereafter)\n"
                        "\nArguments:\n"
@@ -473,7 +473,7 @@ int main (int argc, char *argv[]) {
         cerr << "Find fasta line: " << tag_name << endl;
     } else {
       // Check if we have a raw or tsv line: tag\tname
-      size_t found = lines.find_first_of(" \t");
+      size_t found = lines.find_first_of("\t,; ");
       if (found != string::npos) {
         no_name = 0;
         tag_name = lines.substr(found+1);

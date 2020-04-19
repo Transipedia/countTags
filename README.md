@@ -11,7 +11,7 @@
 First you need to create a file containing the tags you want to quantify.
 You can use three tags format:
  * fasta format
- * separator format : sequence name (the separator can be a space or a tabulation)
+ * separator format : sequence name (the separator can be a space or a tabulation or a comma or a semi-comma)
  * raw format : only the tag sequence
 
 You must use option '-i' to specify the tag file.  You can provide the tags
