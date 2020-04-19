@@ -1,3 +1,6 @@
+# [ ] 20200419-01 : Do not output the number of read in fastq sample
+ * Use the wrongth variable (line_id=nline_read) = number of line and not read
+
 # [X] 20200326-01 : Do not normalize count
  * the code was commented !!! (commit 1adf838c)
 

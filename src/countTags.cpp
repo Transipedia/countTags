@@ -675,7 +675,7 @@ int main (int argc, char *argv[]) {
 
     // store statistic
     nb_factors_by_sample.push_back(nb_factors);
-    nb_reads_by_sample.push_back(line_id);
+    nb_reads_by_sample.push_back(nread);
 
     if (normalize && nb_factors > 0) {
       if (verbose > 1 )
