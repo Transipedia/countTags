@@ -44,6 +44,9 @@
 #include <unistd.h>
 #include <string>
 
+// use namespace std by default
+using namespace std;
+
 // local .h
 #include "optionparser.h"
 #include "dna.h"
@@ -83,7 +86,7 @@ inline uint64_t valns(uint32_t p, char *dna, uint32_t k, int64_t *last, uint64_t
   }
 }
 
-std::string join( const std::vector<std::string>& elements, const char* const separator)
+string join( const vector<string>& elements, const char* const separator)
 {
   switch (elements.size())
   {
@@ -92,8 +95,8 @@ std::string join( const std::vector<std::string>& elements, const char* const se
     case 1:
       return elements[0];
     default:
-      std::ostringstream os;
-      std::copy(elements.begin(), elements.end()-1, std::ostream_iterator<std::string>(os, separator));
+      ostringstream os;
+      copy(elements.begin(), elements.end()-1, ostream_iterator<string>(os, separator));
       os << *elements.rbegin();
       return os.str();
   }
@@ -233,15 +236,15 @@ int main (int argc, char *argv[]) {
 //int nb_threads = 1;                            // --threads: unused
   bool isstranded = false;                       // --stranded: is data stranded
   bool ispaired = false;                         // --paired: is data paired
-  std::string paired = "rf";                     // store paired format ([rf], fr, ff)
+  string paired = "rf";                          // store paired format ([rf], fr, ff)
   bool doalltags = false;                        // --alltags: generated all tags from sequence
   bool normalize = false;                        // --normalize: switch to normalize count
   double normalize_factors;                      // normalize factor MILLION or BILLION
   bool print_tag_names = false;                  // --tag-names: print tag name in sdtout
   bool merge_counts = false;                     // --merge-counts: merge all count in one column
-  std::string merge_counts_colname = "counts";   // --merge-counts-colname: colname for merged column
-  std::string output_read;                       // --reads: filename to output read matching kmer
-  std::string summary_file;                      // --summary: store summary information in a filename
+  string merge_counts_colname = "counts";        // --merge-counts-colname: colname for merged column
+  string output_read;                            // --reads: filename to output read matching kmer
+  string summary_file;                           // --summary: store summary information in a filename
   uint32_t nb_samples = 0;                       // number of fastq file on argument line
   const char * tags_file;                        // -i: mandatory, tag filename
 
@@ -260,12 +263,12 @@ int main (int argc, char *argv[]) {
     return 1;
 
   if (options[HELP] || argc == 0) {
-    option::printUsage(std::cout, usage);
+    option::printUsage(cout, usage);
     return 0;
   }
 
   if (options[VERSIONOPT]) {
-    std::cout << VERSION;
+    cout << VERSION;
     return 0;
   }
 
@@ -277,8 +280,8 @@ int main (int argc, char *argv[]) {
   // Not using Arg::Required from option parser, because
   // is not working with option -V -h
   if (!options[TAG_FILE].count()) {
-    std::cerr << "ERROR : -i tag_file required\n\n";
-    option::printUsage(std::cerr, usage);
+    cerr << "ERROR : -i tag_file required\n\n";
+    option::printUsage(cerr, usage);
     return 1;
   }
 
@@ -286,8 +289,8 @@ int main (int argc, char *argv[]) {
   if (options[KMER_LENGTH]) {
     tag_length = atoi(options[KMER_LENGTH].arg);
     if (tag_length > 32) {
-      std::cerr << "ERROR: For now, K-mer length has to be < 32" << "\n\n";
-      option::printUsage(std::cerr, usage);
+      cerr << "ERROR: For now, K-mer length has to be < 32" << "\n\n";
+      option::printUsage(cerr, usage);
       return 1;
     }
   }
@@ -318,7 +321,7 @@ int main (int argc, char *argv[]) {
       paired = "rf";
     }
     if (verbose>2) {
-      std::cerr << "\tPaired mode turn ON, with option " << paired << ".\n";
+      cerr << "\tPaired mode turn ON, with option " << paired << ".\n";
     }
   }
 
@@ -361,7 +364,7 @@ int main (int argc, char *argv[]) {
     // but set merge_counts to use only one colname
     merge_counts = true;
     if (verbose>2) {
-      std::cerr << "\tColumn name when merging:" << options[MERGE_COUNTS_COLNAME].arg << "\n";
+      cerr << "\tColumn name when merging:" << options[MERGE_COUNTS_COLNAME].arg << "\n";
     }
     merge_counts_colname = options[MERGE_COUNTS_COLNAME].arg;
   }
@@ -381,15 +384,15 @@ int main (int argc, char *argv[]) {
   // Print help for unknown option
   if (options[UNKNOWN]) {
     for (option::Option* opt = options[UNKNOWN]; opt; opt = opt->next())
-        std::cerr << "Unknown option: " << opt->name << "\n";
-    option::printUsage(std::cerr, usage);
+        cerr << "Unknown option: " << opt->name << "\n";
+    option::printUsage(cerr, usage);
     return 1;
   }
 
   // Need at least one fastq file on argument line
   if(parse.nonOptionsCount() < 1) {
-    std::cerr << "No fastq file provided ?" << "\n";
-    option::printUsage(std::cerr, usage);
+    cerr << "No fastq file provided ?" << "\n";
+    option::printUsage(cerr, usage);
     return 0;
   }
   // We have fastq, store number of element in argument line = nb samples
@@ -400,8 +403,8 @@ int main (int argc, char *argv[]) {
 
   // print info for verbose
   if (verbose>2) {
-    std::cerr <<  "Version: " << VERSION << std::endl;
-    std::cerr << "File to analyse: " << std::to_string(parse.nonOptionsCount()) << std::endl;
+    cerr <<  "Version: " << VERSION << endl;
+    cerr << "File to analyse: " << to_string(parse.nonOptionsCount()) << endl;
     for (int i = 0; i < parse.nonOptionsCount(); ++i)
       fprintf(stderr, "Non-option argument #%d is %s\n", i, parse.nonOption(i));
   }
@@ -416,17 +419,17 @@ int main (int argc, char *argv[]) {
   uint64_t tag;                                  // tag int converted from sequence
 
   // hash table of vector to store tag+count
-  std::unordered_map<uint64_t,double*> tags_counts;
+  unordered_map<uint64_t,double*> tags_counts;
   // iterators for tags_counts
-  std::unordered_map<uint64_t,double*>::iterator it_counts;
+  unordered_map<uint64_t,double*>::iterator it_counts;
   // hash table to store tag_name
-  std::unordered_map<uint64_t,std::vector<std::string>> tags_names;
+  unordered_map<uint64_t,vector<string>> tags_names;
   // vector to store nb factors = kmer per sample
-  std::vector<uint64_t> nb_factors_by_sample;
+  vector<uint64_t> nb_factors_by_sample;
   // vector to store nv reads per sample
-  std::vector<uint64_t> nb_reads_by_sample;
+  vector<uint64_t> nb_reads_by_sample;
 
-  std::ofstream hfile_summary;                   // file handle to write summary
+  ofstream hfile_summary;                        // file handle to write summary
 
   /**********************************
    *
@@ -436,56 +439,56 @@ int main (int argc, char *argv[]) {
 
   // local vars
   bool no_name = 1;                              // do we find a tag_name
-  std::string tag_name;                          // store tag_name read or generated
-  std::unique_ptr< std::istream > filein;        // filehandle for tag file
+  string tag_name;                               // store tag_name read or generated
+  unique_ptr< istream > filein;                  // filehandle for tag file
   uint32_t nline_tag = 0;                        // store number of line read in tag_file
 
   if (verbose > 1)
-    std::cerr << "Counting k-mers" << std::endl;
+    cerr << "Counting k-mers" << endl;
 
   // read tags from stdin or file with zstr stream,
   // which manage if gz or not
   try {
     if (*tags_file == '-') {
       // use stdin
-      filein = std::unique_ptr< std::istream >(new zstr::istream(std::cin));
+      filein = unique_ptr< istream >(new zstr::istream(cin));
     } else {
-      filein = std::unique_ptr< std::istream >(new zstr::ifstream(tags_file));
+      filein = unique_ptr< istream >(new zstr::ifstream(tags_file));
     }
   }
   // check if no read error, catch all exceptions
   catch (...){
-    std::cerr << "Error: Can't read "<< tags_file << std::endl;
+    cerr << "Error: Can't read "<< tags_file << endl;
     exit(10);
   }
 
   // Parse file and detect file format (fas, raw or tsv)
-  for (std::string lines; std::getline(*filein, lines); ) {
-    if (lines.find(">") != std::string::npos) {
+  for (string lines; getline(*filein, lines); ) {
+    if (lines.find(">") != string::npos) {
       // we got a fasta line
       no_name = 0;
       tag_name = lines;
       tag_name.erase(0,1); // remove the fasta ">" prefix
       if (verbose>2)
-        std::cerr << "Find fasta line: " << tag_name << std::endl;
+        cerr << "Find fasta line: " << tag_name << endl;
     } else {
       // Check if we have a raw or tsv line: tag\tname
-      std::size_t found = lines.find_first_of(" \t");
-      if (found != std::string::npos) {
+      size_t found = lines.find_first_of(" \t");
+      if (found != string::npos) {
         no_name = 0;
         tag_name = lines.substr(found+1);
         lines.erase(found, lines.length());
       }
       // insert nb_tags as tag_name if none read
       if (no_name)
-        tag_name = std::to_string(nb_tags+1);
+        tag_name = to_string(nb_tags+1);
       // Take at least tag_length for each tags
       if (lines.length() < tag_length) {
-        std::cerr << "Error: tag lower than kmer: " << lines << std::endl;
+        cerr << "Error: tag lower than kmer: " << lines << endl;
         continue;                                // go to next tag
       }
       // convert tag to Int
-      uint32_t max_kmer_toread = 1;    // at least we get the first kmer
+      uint32_t max_kmer_toread = 1;              // at least we get the first kmer
 
       // take all kmer from lines if ALLTAGS option is set
       if (doalltags) {
@@ -495,7 +498,7 @@ int main (int argc, char *argv[]) {
       for (uint32_t i = 0; i < max_kmer_toread ; i++){
         tag = DNAtoInt(lines.substr(i, tag_length).c_str(), tag_length, isstranded);
         if (verbose>2)
-          std::cerr << "tag: " << lines.substr(i, tag_length) << ", name:" << tag_name << ", tag nb: " << i << ", tagInt: " << tag;
+          cerr << "tag: " << lines.substr(i, tag_length) << ", name:" << tag_name << ", tag nb: " << i << ", tagInt: " << tag;
         // Create vector for each tag
         tags_counts[tag] = new double[nb_samples]();
         // Add tag_name or tag_name.kmer if take all tags from sequence
@@ -503,25 +506,25 @@ int main (int argc, char *argv[]) {
           tags_names[tag].push_back(tag_name);
         else {
           // use a temp string to avoid multiple add of .1.2.3.4 ...
-          std::string tempstr = tag_name;
-          tags_names[tag].push_back(tempstr.append(".").append(std::to_string(i)));
+          string tempstr = tag_name;
+          tags_names[tag].push_back(tempstr.append(".").append(to_string(i)));
         }
         nb_tags++;
       }
       if (verbose>2)
-       std::cerr << ", nb_tag: " << nb_tags << std::endl;
+       cerr << ", nb_tag: " << nb_tags << endl;
     }
     nline_tag++;
   }
 
   // We test that tag file is not empty
   if (nline_tag == 0) {
-    std::cerr << "I did not get or understand your tag sequences" << std::endl;
+    cerr << "I did not get or understand your tag sequences" << endl;
     exit(2);
   }
 
    if (verbose > 1)
-     std::cerr << "Finished indexing tags" << std::endl;
+     cerr << "Finished indexing tags" << endl;
 
   /**********************************
    *
@@ -530,58 +533,58 @@ int main (int argc, char *argv[]) {
    *********************************/
 
   // local vars
-  std::ofstream hfile_read;                      // file handle to write read of matching kmer
-  std::string gzip_pipe = "gunzip -fc ";         // string to do pipe easily to decrompress fastq.gz file
+  ofstream hfile_read;                           // file handle to write read of matching kmer
+  string gzip_pipe = "gunzip -fc ";              // string to do pipe easily to decrompress fastq.gz file
 
   // open file to output reads matching kmer
   if (output_read.length()) {
-    hfile_read.open(output_read, std::ifstream::out);
+    hfile_read.open(output_read, ifstream::out);
     // check if not write error
     if (hfile_read.fail()) {
-      std::cerr << "Error: Can't write read matching kmer in file "<< output_read << std::endl;
+      cerr << "Error: Can't write read matching kmer in file "<< output_read << endl;
       return 1;
     }
   }
 
   // open file tp output summary information
   if (summary_file.length()) {
-    hfile_summary.open(summary_file, std::ifstream::out);
+    hfile_summary.open(summary_file, ifstream::out);
     // check if not write error
     if (hfile_summary.fail()) {
-      std::cerr << "Error: Can't write to summary file "<< summary_file << std::endl;
+      cerr << "Error: Can't write to summary file "<< summary_file << endl;
       return 1;
     }
     // send cerr to hfile_summary;
-    std::cerr.rdbuf(hfile_summary.rdbuf());
+    cerr.rdbuf(hfile_summary.rdbuf());
   }
 
   // print arguments use to summary file
   if (verbose) {
-    std::cerr << "CountTags version\t" << VERSION << "\n";
-    std::cerr << "Kmer_size\t" << tag_length << "\n";
-    std::cerr << "Tag file in\t" << tags_file << "\n";
+    cerr << "CountTags version\t" << VERSION << "\n";
+    cerr << "Kmer_size\t" << tag_length << "\n";
+    cerr << "Tag file in\t" << tags_file << "\n";
     if (max_reads < UINT32_MAX)
-      std::cerr << "Maximun reads analyzed\t" << max_reads << "\n";
-    std::cerr << "Normalize\t" << (normalize ? "Yes" : "No") << "\n";
+      cerr << "Maximun reads analyzed\t" << max_reads << "\n";
+    cerr << "Normalize\t" << (normalize ? "Yes" : "No") << "\n";
     if (normalize) {
-      std::cerr << "Normalize by " << normalize_factors << " of kmer." << "\n";
+      cerr << "Normalize by " << normalize_factors << " of kmer." << "\n";
     }
-    std::cerr << "Stranded\t" << (isstranded ? "Yes" : "No") << "\n";
-    std::cerr << "Paired\t" << (ispaired ? paired : "No") << "\n";
-    std::cerr << "Merge count\t" << (merge_counts ? "Yes" : "No") << "\n";
-    std::cerr << "Write matched read in file\t" << (output_read.length() ? output_read : "None") << "\n";
+    cerr << "Stranded\t" << (isstranded ? "Yes" : "No") << "\n";
+    cerr << "Paired\t" << (ispaired ? paired : "No") << "\n";
+    cerr << "Merge count\t" << (merge_counts ? "Yes" : "No") << "\n";
+    cerr << "Write matched read in file\t" << (output_read.length() ? output_read : "None") << "\n";
   }
 
   // Read the fastq
 //#pragma omp parallel num_threads(nb_threads)
   for (uint32_t sample = 0; sample < nb_samples; ++sample) {
     if (verbose > 1)
-       std::cerr << "Counting tags for file: " << "\t" << parse.nonOption(sample) << "\n";
+       cerr << "Counting tags for file: " << "\t" << parse.nonOption(sample) << "\n";
 
     // local vars specific to each sample
     FILE * hfastq;                               // handle to fastq file
     uint32_t seq_length = 0;                     // length of the read
-    uint32_t nread = 0;                        // number of read analyzed
+    uint32_t nread = 0;                          // number of read analyzed
 
     // use c funtionc getline which allocate memory if line=NULL & len=0,
     // line has to be freed at the end
@@ -590,18 +593,22 @@ int main (int argc, char *argv[]) {
     ssize_t linelen;                             // length of line read by getline, include \0
     uint32_t nline_read = 0;                     // store number of line read in hfastq
 
+    // Create the *char to store the tag sequence if output_read is yes and there is match
+    // c style string
+    char *tag_seq = new char[tag_length+1];
+    tag_seq[tag_length] = '\0';
 
     uint64_t nb_factors = 0;                     // number of factors = kmer in a sample
     // values to DNAtoInt
     uint64_t valrev = 0;
     uint64_t valfwd = 0;
     int64_t last = 0;
-    std::string cmdline = "";                    // command line to pass to pipe via popen
+    string cmdline = "";                         // command line to pass to pipe via popen
 
     // Test if fastq file is present, otherwise exit with error 10
-    std::ifstream testfile(parse.nonOption(sample));
+    ifstream testfile(parse.nonOption(sample));
     if (!testfile.good()) {
-      std::cerr << "Error: Can't read fastq file " << parse.nonOption(sample) << std::endl;
+      cerr << "Error: Can't read fastq file " << parse.nonOption(sample) << endl;
       exit(10);
     }
 
@@ -613,7 +620,7 @@ int main (int argc, char *argv[]) {
     bool getrev = false;
 
     if (ispaired) {
-      if ( std::string(parse.nonOption(sample)).find("_1.fastq") != std::string::npos) {
+      if ( string(parse.nonOption(sample)).find("_1.fastq") != string::npos) {
         // we got the first pair
         if (paired.compare("rf") == 0) {
           getrev = true;
@@ -626,7 +633,7 @@ int main (int argc, char *argv[]) {
       }
     }
     if (verbose > 2)
-      std::cerr << "Paired mode ON, getrev = " << std::to_string(getrev) << ", for file " << parse.nonOption(sample) << std::endl;
+      cerr << "Paired mode ON, getrev = " << to_string(getrev) << ", for file " << parse.nonOption(sample) << endl;
 
     while ((linelen = getline(&line, &len, hfastq)) != -1) {
       // If this line is a sequence
@@ -638,7 +645,7 @@ int main (int argc, char *argv[]) {
         }
         // Print a user-friendly output on STDERR every each XXXX reads processed
         if (verbose > 1 && nread % MILLION == 0) {
-          std::cerr << nread << " reads parsed" << std::endl;
+          cerr << nread << " reads parsed" << endl;
         }
         // set seq to line
         seq_length = linelen - 1; // Minus 1 because we have a new line character
@@ -656,10 +663,7 @@ int main (int argc, char *argv[]) {
           if (it_counts != tags_counts.end()) {
             it_counts->second[sample]++;
             // output read in a file if required
-            // TODO: move new before loop, to avoid creation each time when option is on
             if (output_read.length()) {
-              char *tag_seq = new char[tag_length+1];
-              tag_seq[tag_length] = '\0';
                 intToDNA(it_counts->first, tag_length, tag_seq);
                 hfile_read << tag_seq;
                 if(print_tag_names) {
@@ -679,7 +683,7 @@ int main (int argc, char *argv[]) {
 
     if (normalize && nb_factors > 0) {
       if (verbose > 1 )
-        std::cerr << "Normalize counts" << std::endl;
+        cerr << "Normalize counts" << endl;
       for (it_counts=tags_counts.begin(); it_counts!=tags_counts.end(); ++it_counts) {
         if (it_counts->second[sample] > 0) {
           it_counts->second[sample] = it_counts->second[sample] * normalize_factors / nb_factors;
@@ -700,82 +704,82 @@ int main (int argc, char *argv[]) {
    *********************************/
 
   // First print headers
-  std::cout << "tag";
+  cout << "tag";
   if (print_tag_names)
-    std::cout << "\ttag_names";
+    cout << "\ttag_names";
   if(!merge_counts) {
     for (uint32_t sample = 0; sample < nb_samples; ++sample) {
       // keep basename for fastq filename
-      std::size_t found = std::string(parse.nonOption(sample)).find_last_of("/");
-      if (found == std::string::npos)
+      size_t found = string(parse.nonOption(sample)).find_last_of("/");
+      if (found == string::npos)
         found = -1;      // set to the beginning if no path present
-      std::cout << "\t" << std::string(parse.nonOption(sample)).substr(found+1);
+      cout << "\t" << string(parse.nonOption(sample)).substr(found+1);
     }
   } else {
-    std::cout << "\t" << merge_counts_colname;
+    cout << "\t" << merge_counts_colname;
   }
-  std::cout << "\n";
+  cout << "\n";
   // print tag + value
   char *tag_seq = new char[tag_length+1];
   tag_seq[tag_length] = '\0';
   for (it_counts=tags_counts.begin(); it_counts!=tags_counts.end(); ++it_counts) {
     intToDNA(it_counts->first,tag_length,tag_seq);
-    std::cout << tag_seq;
+    cout << tag_seq;
     if(print_tag_names) {
-      std::cout << "\t" << join(tags_names[it_counts->first],",");
+      cout << "\t" << join(tags_names[it_counts->first],",");
     }
     if(!merge_counts){
       for (uint32_t sample = 0; sample < nb_samples; ++sample) {
-        std::cout << "\t" << it_counts->second[sample];
+        cout << "\t" << it_counts->second[sample];
       }
     } else {
       double count_sum = 0;
       for (uint32_t sample = 0; sample < nb_samples; ++sample) {
         count_sum += it_counts->second[sample];
       }
-      std::cout << "\t" << count_sum;
+      cout << "\t" << count_sum;
     }
-    std::cout << std::endl;
+    cout << endl;
   }
 
 
   // print statistic if verbose or summary
   if (verbose) {
-    std::cerr << "# Total statistic per file\n";
-    std::cerr << "File\t";
+    cerr << "# Total statistic per file\n";
+    cerr << "File\t";
     if(!merge_counts) {
       for (uint32_t sample = 0; sample < nb_samples; ++sample) {
-        std::cerr << "\t" << parse.nonOption(sample);
+        cerr << "\t" << parse.nonOption(sample);
       }
     } else {
-      std::cerr << "\t" << merge_counts_colname;
+      cerr << "\t" << merge_counts_colname;
     }
-    std::cerr << "\n";
-    std::cerr << "total_factors";
+    cerr << "\n";
+    cerr << "total_factors";
     if(!merge_counts) {
       for (uint32_t sample = 0; sample < nb_samples; ++sample) {
-        std::cerr << "\t" << nb_factors_by_sample[sample];
+        cerr << "\t" << nb_factors_by_sample[sample];
       }
     } else {
       uint64_t nb_factors_sum = 0;
       for (uint32_t sample = 0; sample < nb_samples; ++sample) {
         nb_factors_sum += nb_factors_by_sample[sample];
       }
-      std::cerr << "\t" << nb_factors_sum;
+      cerr << "\t" << nb_factors_sum;
     }
-    std::cerr << std::endl;
-    std::cerr << "total_reads";
+    cerr << endl;
+    cerr << "total_reads";
     if(!merge_counts) {
       for (uint32_t sample = 0; sample < nb_samples; ++sample) {
-        std::cerr << "\t" << nb_reads_by_sample[sample];
+        cerr << "\t" << nb_reads_by_sample[sample];
       }
     } else {
       uint64_t sum = 0;
       for (uint32_t sample = 0; sample < nb_samples; ++sample) {
         sum += nb_reads_by_sample[sample];
       }
-      std::cerr << "\t" << sum;
+      cerr << "\t" << sum;
     }
-    std::cerr << std::endl;
+    cerr << endl;
   }
 }
