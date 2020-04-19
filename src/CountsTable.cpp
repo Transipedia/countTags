@@ -96,7 +96,7 @@ void CountsTable::recurrencyFilter(uint recurrency_threshold) {
   std::unordered_map<uint64_t,uint32_t*>::iterator it_counts = this->tags_counts.begin();
   while (it_counts != this->tags_counts.end()) {
     uint recurrency = 0;
-    for (int s = 0; s < this->nb_samples; ++s) {
+    for (uint s = 0; s < this->nb_samples; ++s) {
       if (it_counts->second[s] > 0) {
         recurrency++;
       }
@@ -115,7 +115,7 @@ void CountsTable::printCounts(char sep) {
 
   /* Print Headers */
   std::cout << "tag";
-  for (int s = 0; s < this->nb_samples; ++s) {
+  for (uint s = 0; s < this->nb_samples; ++s) {
     std::cout << sep << this->sample_names[s];
   }
   std::cout << std::endl;
@@ -124,7 +124,7 @@ void CountsTable::printCounts(char sep) {
   for (it_counts = tags_counts.begin(); it_counts != tags_counts.end(); ++it_counts) {
     intToDNA(it_counts->first,this->kmer_length,tag_seq);
     std::cout << tag_seq;
-    for (int s = 0; s < this->nb_samples; ++s) {
+    for (uint s = 0; s < this->nb_samples; ++s) {
       std::cout << "\t" << it_counts->second[s];
     }
     std::cout << std::endl;
