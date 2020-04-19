@@ -588,7 +588,7 @@ int main (int argc, char *argv[]) {
     // line has to be freed at the end
     char * line = NULL;                          // char* to each line read in hfastq
     size_t len = 0;                              // length of buffer line read by getline
-    ssize_t read;                                // length of line read by getline, include \0
+    ssize_t linelen;                             // length of line read by getline, include \0
     line_id = 0;                                 // store number of line read in hfastq
 
 
@@ -629,7 +629,7 @@ int main (int argc, char *argv[]) {
     if (verbose > 2)
       std::cerr << "Paired mode ON, getrev = " << std::to_string(getrev) << ", for file " << parse.nonOption(sample) << std::endl;
 
-    while ((read = getline(&line, &len, hfastq)) != -1) {
+    while ((linelen = getline(&line, &len, hfastq)) != -1) {
       // If this line is a sequence
       if (line_id % 4 == 1) {
         // how many read are analyzed
@@ -643,8 +643,7 @@ int main (int argc, char *argv[]) {
         }
         // set seq to line
         seq = line;
-        seq_length = strlen(seq) - 1; // Minus 1 because we have a new line character
-
+        seq_length = linelen - 1; // Minus 1 because we have a new line character
         // Skip the sequence if the read length is < to the tag_length
         if (seq_length < tag_length)
           continue;
