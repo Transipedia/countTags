@@ -581,7 +581,7 @@ int main (int argc, char *argv[]) {
     // local vars specific to each sample
     FILE * hfastq;                               // handle to fastq file
     uint32_t seq_length = 0;                     // length of the read
-    uint32_t read_id = 0;                        // number of read analyzed
+    uint32_t nread = 0;                        // number of read analyzed
     char * seq;
 
     // use c funtionc getline which allocate memory if line=NULL & len=0,
@@ -633,13 +633,13 @@ int main (int argc, char *argv[]) {
       // If this line is a sequence
       if (line_id % 4 == 1) {
         // how many read are analyzed
-        read_id = ((int)((double)line_id*0.25) + 1);
-        if (read_id >= max_reads) {
+        nread = ((int)((double)line_id*0.25) + 1);
+        if (nread >= max_reads) {
           break;
         }
         // Print a user-friendly output on STDERR every each XXXX reads processed
-        if (verbose > 1 && read_id % MILLION == 0) {
-          std::cerr << (int)((double)line_id*0.25) + 1 << " reads parsed" << std::endl;
+        if (verbose > 1 && nread % MILLION == 0) {
+          std::cerr << nread << " reads parsed" << std::endl;
         }
         // set seq to line
         seq = line;
