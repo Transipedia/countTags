@@ -282,8 +282,7 @@ int main (int argc, char *argv[]) {
     return 1;
   }
 
-  // TODO we should check the length to choose the appropriate
-  // integer size to use
+  // Check we can use the kmer size set by the user
   if (options[KMER_LENGTH]) {
     tag_length = atoi(options[KMER_LENGTH].arg);
     if (tag_length > 32) {
@@ -503,6 +502,7 @@ int main (int argc, char *argv[]) {
         if (! doalltags)
           tags_names[tag].push_back(tag_name);
         else {
+          // use a temp string to avoid multiple add of .1.2.3.4 ...
           std::string tempstr = tag_name;
           tags_names[tag].push_back(tempstr.append(".").append(std::to_string(i)));
         }
@@ -681,7 +681,6 @@ int main (int argc, char *argv[]) {
       if (verbose > 1 )
         std::cerr << "Normalize counts" << std::endl;
       for (it_counts=tags_counts.begin(); it_counts!=tags_counts.end(); ++it_counts) {
-        // TODO We should take into accout the error rate...
         if (it_counts->second[sample] > 0) {
           it_counts->second[sample] = it_counts->second[sample] * normalize_factors / nb_factors;
         }
