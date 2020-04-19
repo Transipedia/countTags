@@ -582,7 +582,6 @@ int main (int argc, char *argv[]) {
     FILE * hfastq;                               // handle to fastq file
     uint32_t seq_length = 0;                     // length of the read
     uint32_t nread = 0;                        // number of read analyzed
-    char * seq;
 
     // use c funtionc getline which allocate memory if line=NULL & len=0,
     // line has to be freed at the end
@@ -642,7 +641,6 @@ int main (int argc, char *argv[]) {
           std::cerr << nread << " reads parsed" << std::endl;
         }
         // set seq to line
-        seq = line;
         seq_length = linelen - 1; // Minus 1 because we have a new line character
         // Skip the sequence if the read length is < to the tag_length
         if (seq_length < tag_length)
@@ -653,7 +651,7 @@ int main (int argc, char *argv[]) {
         last = -3;
 
         for (uint32_t i = 0; i < nb_tags; i++) {
-          it_counts = tags_counts.find(valns(i, seq, tag_length, &last, &valfwd, &valrev, isstranded, getrev));
+          it_counts = tags_counts.find(valns(i, line, tag_length, &last, &valfwd, &valrev, isstranded, getrev));
           // did we find a tag in the seq
           if (it_counts != tags_counts.end()) {
             it_counts->second[sample]++;
@@ -667,7 +665,7 @@ int main (int argc, char *argv[]) {
                 if(print_tag_names) {
                   hfile_read << "\t" << join(tags_names[it_counts->first], ",");
                 }
-              hfile_read << "\t" << parse.nonOption(sample) << "\t" << seq;
+              hfile_read << "\t" << parse.nonOption(sample) << "\t" << line;
             }
           }
         }
