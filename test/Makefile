@@ -5,10 +5,10 @@ all: test_ok test_error_parsing test_stranded
 test_ok:
 	@echo "$(RED)Test everything is fine:$(NoColor)"
 	@echo "$(PURPLE)# test with tag-names$(NoColor)"
-	for f in fas tsv csv; do ../bin/countTags --tag-names -k 30 -i $(okfile).$$f test_?.fastq.gz > /tmp/$(ofile)_names_$${f}_ok.txt; done
+	@for f in fas tsv csv; do ../bin/countTags --tag-names -k 30 -i $(okfile).$$f test_?.fastq.gz | sort > /tmp/$(ofile)_names_$${f}_ok.txt; done
 	for i in /tmp/$(ofile)_names_*_ok.txt; do echo "$(GREEN)$$i$(NoColor)"; diff $$i ok/$(ofile)_with_names_ok.txt;done
 	@echo "$(PURPLE)# test without tag-names$(NoColor)"
-	for f in fas tsv csv raw; do ../bin/countTags -k 30 -i $(okfile).$$f test_?.fastq.gz > /tmp/$(ofile)_without_$${f}_ok.txt; done
+	@for f in fas tsv csv raw; do ../bin/countTags -k 30 -i $(okfile).$$f test_?.fastq.gz | sort > /tmp/$(ofile)_without_$${f}_ok.txt; done
 	for i in /tmp/$(ofile)_without_*.txt; do echo $i; diff $$i ok/$(ofile)_without_names_ok.txt;done
 
 test_error_parsing:
@@ -17,8 +17,8 @@ test_error_parsing:
 
 test_stranded:
 	@echo "$(RED)Test with stranded option:$(NoColor)"
-	for f in fas tsv csv; do ../bin/countTags --tag-names -k 30 --stranded -i $(okfile).$$f test_?.fastq.gz > /tmp/$(ofile)_names_$${f}_okstranded.txt; done
 	for i in /tmp/$(ofile)_names_*_okstranded.txt; do echo "$(GREEN)$$i$(NoColor)"; diff $$i stranded/$(ofile)_with_names_ok.txt;done
+	for f in fas tsv csv; do ../bin/countTags --tag-names -k 30 --stranded -i $(okfile).$$f test_?.fastq.gz | sort > /tmp/$(ofile)_names_$${f}_okstranded.txt; done
 
 init:
 	rm -f $(okfile).*
@@ -45,5 +45,5 @@ init:
 	# Create raw file format
 	cut -d ' ' -f1 $(okfile).csv > $(okfile).raw
 	# Generate expected results
-	../attic/$(countTagsReference) --tag-names -k 30 -i $(okfile).fas test_?.fastq.gz > ok/$(ofile)_with_names_ok.txt
-	../attic/$(countTagsReference) -k 30 -i $(okfile).fas test_?.fastq.gz > ok/$(ofile)_without_names_ok.txt
+	../attic/$(countTagsReference) --tag-names -k 30 -i $(okfile).fas test_?.fastq.gz | sort > ok/$(ofile)_with_names_ok.txt
+	../attic/$(countTagsReference) -k 30 -i $(okfile).fas test_?.fastq.gz | sort > ok/$(ofile)_without_names_ok.txt
