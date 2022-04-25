@@ -1,3 +1,8 @@
+# [ ] 20210425-01 : Count twice the read if read are paired and overlapping
+ * Solution 1:
+   - analyse paired reads in same time and check if same kmer
+     - problem may be if kmer is repeated ?
+
 # [X] 20200419-01 : Do not output the number of read in fastq sample
  * Use the wrongth variable (line_id=nline_read) = number of line and not read
  * Use nread to output the rigth value (commit 459de402587)
