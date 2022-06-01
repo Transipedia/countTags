@@ -635,7 +635,15 @@ int main (int argc, char *argv[]) {
     if (verbose > 2)
       cerr << "Paired mode ON, getrev = " << to_string(getrev) << ", for file " << parse.nonOption(sample) << endl;
 
+    string read_header = "";
     while ((linelen = getline(&line, &len, hfastq)) != -1) {
+      // store read header
+      if (nline_read % 4 == 0) {
+        read_header = line;
+        // remove newline char
+        read_header.erase(read_header.size() - 1);
+      }
+
       // If this line is a sequence
       if (nline_read % 4 == 1) {
         // how many read are analyzed
