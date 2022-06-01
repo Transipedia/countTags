@@ -665,21 +665,36 @@ int main (int argc, char *argv[]) {
         nb_factors += nb_tags;
         last = -3;
 
+        // keep all kmers find in this read
+        vector<uint64_t> kmers_find;
         for (uint32_t i = 0; i < nb_tags; i++) {
           it_counts = tags_counts.find(valns(i, line, tag_length, &last, &valfwd, &valrev, isstranded, getrev));
           // did we find a tag in the seq
           if (it_counts != tags_counts.end()) {
             it_counts->second[sample]++;
-            // output read in a file if required
+            // store kmers find to output the read at the end of the loop
             if (output_read.length()) {
-                intToDNA(it_counts->first, tag_length, tag_seq);
-                hfile_read << tag_seq;
-                if(print_tag_names) {
-                  hfile_read << "\t" << join(tags_names[it_counts->first], ",");
-                }
-              hfile_read << "\t" << parse.nonOption(sample) << "\t" << line;
+              kmers_find.push_back(it_counts->first);
             }
           }
+        }
+        // output read in a file if required
+        if (output_read.length() && ! kmers_find.empty()) {
+            vector<string> temp_seq, temp_tagname;
+            // get all seq and tag names
+            for (auto & i : kmers_find) {
+              // convert int to seq
+              intToDNA(i, tag_length, tag_seq);
+              temp_seq.push_back(std::string(tag_seq));
+              if (print_tag_names) {
+                temp_tagname = tags_names[i];
+              }
+            }
+            hfile_read << join(temp_seq, ",");
+            if (print_tag_names) {
+              hfile_read << "\t" << join(temp_tagname, ",");
+            }
+            hfile_read << "\t" << parse.nonOption(sample) << "\t" << read_header << "\t" << line;
         }
       }
       nline_read++;
