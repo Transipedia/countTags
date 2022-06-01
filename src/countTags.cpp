@@ -422,7 +422,7 @@ int main (int argc, char *argv[]) {
   unordered_map<uint64_t,double*> tags_counts;
   // iterators for tags_counts
   unordered_map<uint64_t,double*>::iterator it_counts;
-  // hash table to store tag_name
+  // hash table to store tag_name, can have same kmer with different name
   unordered_map<uint64_t,vector<string>> tags_names;
   // vector to store nb factors = kmer per sample
   vector<uint64_t> nb_factors_by_sample;
