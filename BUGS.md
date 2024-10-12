@@ -1,3 +1,12 @@
+# [ ] 20230911-01 : segfault with summary, but not all the time
+    - run: echo GACACAAAAGAGGAAAAGTGAACCCAAAACATACA |  countTags -i - -k 31 --nostranded --summary titi ../test/input_bcalm/SRR10092187_10k.fastq
+    - output:
+        tag	SRR10092187_10k.fastq
+        GACACAAAAGAGGAAAAGTGAACCCAAAACA	2
+        Erreur de segmentation
+    - data from reindeer
+    - not present if no summary asked
+
 # [ ] 20210425-01 : Count twice the read if read are paired and overlapping
  * Solution 1:
    - analyse paired reads in same time and check if same kmer
