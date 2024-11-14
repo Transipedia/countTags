@@ -1,3 +1,7 @@
+# [ ] 20241113-01 : In few fastq files, all kmers are count to 0
+    - happens on crozet data microglie
+    - when a read smaller than k
+
 # [ ] 20230911-01 : segfault with summary, but not all the time
     - run: echo GACACAAAAGAGGAAAAGTGAACCCAAAACATACA |  countTags -i - -k 31 --nostranded --summary titi ../test/input_bcalm/SRR10092187_10k.fastq
     - output:

@@ -658,8 +658,10 @@ int main (int argc, char *argv[]) {
         // set seq to line
         seq_length = linelen - 1; // Minus 1 because we have a new line character
         // Skip the sequence if the read length is < to the tag_length
-        if (seq_length < tag_length)
+        if (seq_length < tag_length) {
+          nline_read++;
           continue;
+        }
 
         nb_tags = seq_length - tag_length + 1;
         nb_factors += nb_tags;
