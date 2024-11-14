@@ -637,15 +637,18 @@ int main (int argc, char *argv[]) {
 
     string read_header = "";
     while ((linelen = getline(&line, &len, hfastq)) != -1) {
+      /*cerr << "DEBUG read line : " << nline_read << endl;*/
       // store read header
       if (nline_read % 4 == 0) {
         read_header = line;
         // remove newline char
         read_header.erase(read_header.size() - 1);
+        /*cerr << "DEBUG\tread a header" << endl;*/
       }
 
       // If this line is a sequence
       if (nline_read % 4 == 1) {
+        /*cerr << "DEBUG\tread a seq : " << line << endl;*/
         // how many read are analyzed
         nread = ((int)((double)nline_read*0.25) + 1);
         if (nread >= max_reads) {
@@ -659,10 +662,12 @@ int main (int argc, char *argv[]) {
         seq_length = linelen - 1; // Minus 1 because we have a new line character
         // Skip the sequence if the read length is < to the tag_length
         if (seq_length < tag_length) {
+          /*cerr << "read smaller than kmer: read length = " << seq_length  << endl;*/
           nline_read++;
           continue;
         }
 
+        /*cerr << "DEBUG\tconvert to kmer: " << endl;*/
         nb_tags = seq_length - tag_length + 1;
         nb_factors += nb_tags;
         last = -3;
