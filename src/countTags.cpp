@@ -179,12 +179,12 @@ const option::Descriptor usage[] =
  * }
  */
   {UNKNOWN,      0, "" , "",
-    option::Arg::None, "The purpose of countTags is to count occurences of few tags in large set of fastq files.\n\n"
+    option::Arg::None, "The purpose of countTags is to count occurences of few tags/kmers in large set of fastq files.\n\n"
                        "USAGE: countTags [options] -i tags.file[.gz] seq.fastq[.gz] ...\n"
                        "\nVersion: " VERSION "\n"
                        "======\n"
                        " * Tags file format: fasta, tsv (tag[ \\t,;]name) or raw (tag)\n"
-                       " * Use '-' for reading tags from STDIN\n"
+                       " * Use '-' for reading tags/kmers from STDIN\n"
                        " * the file can be in gzip format, otherwise uncompress before and pass to countTags via a pipe (see example hereafter)\n"
                        "\nArguments:\n"
                        "========\n" },
@@ -251,7 +251,7 @@ int main (int argc, char *argv[]) {
 
   // Options vars
   int verbose = 0;                               // --verbose: verbose level
-  uint32_t tag_length = 22;                      // -k: default kmer length
+  uint32_t tag_length = 31;                      // -k: default kmer length
   uint32_t max_reads = UINT32_MAX;               // --maxreads: max number of reads to analyze
 //int nb_threads = 1;                            // --threads: unused
   bool isstranded = false;                       // --stranded: is data stranded
@@ -309,7 +309,7 @@ int main (int argc, char *argv[]) {
   if (options[KMER_LENGTH]) {
     tag_length = atoi(options[KMER_LENGTH].arg);
     if (tag_length > 32) {
-      cerr << "ERROR: For now, K-mer length has to be < 32" << "\n\n";
+      cerr << "ERROR: For now, K-mer length has to be <= 32" << "\n\n";
       option::printUsage(cerr, usage);
       return 1;
     }
@@ -735,7 +735,7 @@ int main (int argc, char *argv[]) {
             if (print_tag_names) {
               hfile_read << "\t" << join(temp_tagname, ",");
             }
-            hfile_read << "\t" << parse.nonOption(sample) << "\t" << read_header << "\t" << line;
+            hfile_read << "\t" << parse.nonOption(sample) << "\t" << read_header << "\t" << read_qc << "\t" << line;
         }
       } else {                                          // end of nread % 4
           cerr << "Get a partial read : " << read_header << endl;
