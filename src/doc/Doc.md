@@ -36,3 +36,7 @@
       if (val != NULL)
         VERSION = std::string(val);
 
+# Help
+
+### C++ vs C
+ * [string to char\*] https://stackoverflow.com/questions/7352099/stdstring-to-char)
