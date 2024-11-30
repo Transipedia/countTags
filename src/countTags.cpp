@@ -51,79 +51,12 @@ using namespace std;
 // local .h
 #include "optionparser.h"
 #include "dna.h"
+#include "utils.h"
 #include "version.h"
 #include "zstr.hpp"
 
 #define MILLION 1000000
 #define BILLION 1000000000
-
-//return the minumum value of the k-mer at pos p between strand rev and stran fwd
-//TODO add a function that get a DNA string and a k value, and return a array of vector values
-inline uint64_t valns(uint32_t p, char *dna, uint32_t k, int64_t *last, uint64_t *valfwd, uint64_t *valrev, bool isstranded = false, bool getrev = false){
-  int e=p-*last;
-  if (e!=1){
-    *last=p;
-    *valfwd=DNAtoInt(&dna[p], k, true);
-    *valrev=intRevcomp(*valfwd, k);
-  } else{
-    // Compute the new value from the previous one.
-    uint64_t m=1;
-    *valfwd%=m<<(2*k-2);
-    *valfwd<<=2;
-    int new_nuc = convNuc(dna[p+k-1]);
-    *valfwd += new_nuc;
-    *last=p;
-    *valrev/=1<<(2);
-    *valrev+=(uint64_t)compNuc(new_nuc)<<(2*k-2);
-  }
-  // when paired and read are reverse
-  if (getrev)
-    return *valrev;
-  // otherwise
-  if (isstranded || *valfwd < *valrev) {
-    return *valfwd;
-  } else {
-    return *valrev;
-  }
-}
-
-string join( const vector<string>& elements, const char* const separator)
-{
-  switch (elements.size())
-  {
-    case 0:
-      return "";
-    case 1:
-      return elements[0];
-    default:
-      ostringstream os;
-      copy(elements.begin(), elements.end()-1, ostream_iterator<string>(os, separator));
-      os << *elements.rbegin();
-      return os.str();
-  }
-}
-
-/* a read line from fastq and check if not at EOF */
-bool read_aline (string &astr, FILE * hfile)
-{
-  // use c funtion getline, for popen function, which allocate memory if line=NULL & len=0,
-  // line has to be freed at the end
-  char * line = NULL;                          // char* to each line read in hfastq
-  size_t len = 0;                             // length of buffer line read by getline
-  ssize_t linelen;                             // length of line read by getline, include \0
-  linelen = getline(&line, &len, hfile);
-  // remove newline char
-  //cerr << "\tgetline : " << line << ", len : " << linelen << endl;
-  if (linelen == -1) {
-    astr = "";
-    return 0;
-  }
-  astr = line;
-  astr.erase(astr.size() - 1);
-  return 1;
-  //  if (line)
-  //    free(line);
-}
 
 struct Arg: public option::Arg
 {
@@ -452,6 +385,17 @@ int main (int argc, char *argv[]) {
   // vector to store nv reads per sample
   vector<uint64_t> nb_reads_by_sample;
 
+  /*
+   * hash(kmer) -> counts
+   * hash(kmer) -> vector(tag names)
+   *
+   *
+   * hash(kmer) -> counts
+   * hash(kmer) -> vector(id tag seq)
+   * vector(id tag seq) -> string(tag name)
+   * vector(id tag seq) ->  vector(kmer)
+   *
+   */
   ofstream hfile_summary;                        // file handle to write summary
 
   /**********************************

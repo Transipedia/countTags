@@ -121,4 +121,34 @@ inline uint64_t DNAtoInt(const char *dna, uint32_t dna_length, bool stranded = f
   return dna_int;
 }
 
+//return the minumum value of the k-mer at pos p between strand rev and stran fwd
+//TODO add a function that get a DNA string and a k value, and return a array of vector values
+inline uint64_t valns(uint32_t p, char *dna, uint32_t k, int64_t *last, uint64_t *valfwd, uint64_t *valrev, bool isstranded = false, bool getrev = false){
+  int e=p-*last;
+  if (e!=1){
+    *last=p;
+    *valfwd=DNAtoInt(&dna[p], k, true);
+    *valrev=intRevcomp(*valfwd, k);
+  } else{
+    // Compute the new value from the previous one.
+    uint64_t m=1;
+    *valfwd%=m<<(2*k-2);
+    *valfwd<<=2;
+    int new_nuc = convNuc(dna[p+k-1]);
+    *valfwd += new_nuc;
+    *last=p;
+    *valrev/=1<<(2);
+    *valrev+=(uint64_t)compNuc(new_nuc)<<(2*k-2);
+  }
+  // when paired and read are reverse
+  if (getrev)
+    return *valrev;
+  // otherwise
+  if (isstranded || *valfwd < *valrev) {
+    return *valfwd;
+  } else {
+    return *valrev;
+  }
+}
+
 #endif // DNA_H_
