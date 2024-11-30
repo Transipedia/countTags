@@ -120,6 +120,8 @@ bool read_aline (string &astr, FILE * hfile)
   astr = line;
   astr.erase(astr.size() - 1);
   return 1;
+  //  if (line)
+  //    free(line);
 }
 
 struct Arg: public option::Arg
@@ -566,7 +568,7 @@ int main (int argc, char *argv[]) {
     }
   }
 
-  // open file tp output summary information
+  // open file to output summary information
   if (summary_file.length()) {
     hfile_summary.open(summary_file, ifstream::out);
     // check if not write error
@@ -606,9 +608,6 @@ int main (int argc, char *argv[]) {
     uint32_t seq_length = 0;                     // length of the read
     uint32_t nread = 0;                          // number of read analyzed
 
-    // use c funtion getline, for popen function, which allocate memory if line=NULL & len=0,
-    // line has to be freed at the end
-    char * line = NULL;                          // char* to each line read in hfastq
     uint32_t nline_read = 0;                     // store number of line read in hfastq
 
     // Create the *char to store the tag sequence if output_read is yes and there is match
@@ -759,8 +758,6 @@ int main (int argc, char *argv[]) {
 
     // Close file and clear line buffer
     pclose(hfastq);
-    if (line)
-      free(line);
   }                                              // end of for each sample
 
   /**********************************
