@@ -6,14 +6,14 @@ okfile=TAGS_test
 countTagsReference=countTags-v0.4.5
 
 # color for bash
-RED='\033[0;31m'
-lightRed='\033[1;31m'
-GREEN='\033[0;32m'
-lightGREEN='\033[1;32m'
-PURPLE='\033[0;35m'
-lightPURPLE='\033[1;35m'
-BLUE='\033[0;34m'
-lightBLUE='\033[1;34m'
-NoColor='\033[0m'
-GRAY='\033[1;33m'
-BROWNBG='\033[1;43m'
+RED=\033[0;31m
+lightRed=\033[1;31m
+GREEN=\033[0;32m
+lightGREEN=\033[1;32m
+PURPLE=\033[0;35m
+lightPURPLE=\033[1;35m
+BLUE=\033[0;34m
+lightBLUE=\033[1;34m
+NoColor=\033[0m
+GRAY=\033[1;33m
+BROWNBG=\033[1;43m

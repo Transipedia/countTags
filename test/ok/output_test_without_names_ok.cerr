@@ -1,0 +1,12 @@
+Error: tag lower than kmer: GCTTAGGCAGAAGCC
+Error: tag lower than kmer: ATAGGGGAAATCAGT
+Error: tag lower than kmer: TGCTTGAGAGTGAGC
+Error: tag lower than kmer: CCGTTTACCCGCGCT
+Error: tag lower than kmer: GCTTGGGCGGGGGCC
+Error: tag lower than kmer: GTGGGGGGGGTCGGT
+Error: tag lower than kmer: TGCTTGGGGGTGGGC
+Error: tag lower than kmer: CCGTTTGCCCGCGCT
+# Total statistic per file
+File		test_1.fastq.gz	test_2.fastq.gz
+total_factors	720000	720000
+total_reads	40000	40000

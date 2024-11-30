@@ -1,5 +1,5 @@
 ACTAGAGTCAAGCTCAACAGGGTCTTCTTT HightLengthFasta Header with a large length text - was number 2 in TAGS_test.csv - be very very very very very long format (count is 52)
 CGACATCGAAGGATCAAAAAGCGACGTCGC HalfLongFasta header with a half-large length text (count 72)
 TCCCCAGGAAGAGCTTCACTCAAAGCTTCA SpecialCharacter Fasta header with a tab   a comma, a pipe | a space (count 30)
-CCGGGTTAAGGCGCCCGATGCCGACGCTCA LongFasta header 1, they will be mix at the end, even with special character (,;:!|) - 
+CCGGGTTAAGGCGCCCGATGCCGACGCTCA LongFasta header 1, they will be mix at the end, even with special character (,;:!|) -
 CCGGGTTAAGGCGCCCGATGCCGACGCTCA LongFasta header 2 (count 48)
