@@ -1,7 +1,7 @@
 include Makefile.ref
 SHELL:=/bin/bash
 
-all: clean test_ok test_stranded test_error_parsing
+all: clean test_ok test_stranded test_error_parsing test_error_fastq
 	@if [ -e /tmp/$(ofile).error ]; then echo -e "$(RED)ERROR HAPPENS$(NoColor)" ; else echo -e "\n$(GREEN)ALL FINE$(NoColor)" ; rm /tmp/$(ofile)*; fi
 
 test_ok:
@@ -16,6 +16,10 @@ test_ok:
 test_error_parsing:
 	@echo -e "$(PURPLE)Test error in parsing argument:$(NoColor)"
 	@../bin/countTags --tags_names --tag-format 2 -k 30 -m 10 $(okfile).raw test_?.fastq.gz 2>/dev/null >/dev/null ; if [ $$? -eq 1 ]; then echo -e "$(GREEN)ok$(NoColor)"; else echo -e "$(RED)ERROR$(NoColor)"; fi
+
+test_error_fastq:
+	@echo -e "$(PURPLE)Test error with trunc fastq:$(NoColor)"
+	@for i in 2 3 4; do echo -e "$(BROWNBG)Missing line $$i in fastq$(NoColor):"; ../bin/countTags -k 30 -i $(okfile).raw test_trunc$$i.fastq.gz 2>/dev/null >/dev/null ; if [ $$? -eq $$i ]; then echo -e "$(GREEN)ok$(NoColor)"; else echo -e "$(RED)ERROR$(NoColor)"; echo "1" > /tmp/$(ofile).error; fi; done
 
 test_stranded:
 	@echo -e "$(PURPLE)Test with stranded option:$(NoColor)"

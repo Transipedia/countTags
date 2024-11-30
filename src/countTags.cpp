@@ -102,6 +102,26 @@ string join( const vector<string>& elements, const char* const separator)
   }
 }
 
+/* a read line from fastq and check if not at EOF */
+bool read_aline (string &astr, FILE * hfile)
+{
+  // use c funtion getline, for popen function, which allocate memory if line=NULL & len=0,
+  // line has to be freed at the end
+  char * line = NULL;                          // char* to each line read in hfastq
+  size_t len = 0;                             // length of buffer line read by getline
+  ssize_t linelen;                             // length of line read by getline, include \0
+  linelen = getline(&line, &len, hfile);
+  // remove newline char
+  //cerr << "\tgetline : " << line << ", len : " << linelen << endl;
+  if (linelen == -1) {
+    astr = "";
+    return 0;
+  }
+  astr = line;
+  astr.erase(astr.size() - 1);
+  return 1;
+}
+
 struct Arg: public option::Arg
 {
   static void printError(const char* msg1, const option::Option& opt, const char* msg2)
@@ -586,11 +606,9 @@ int main (int argc, char *argv[]) {
     uint32_t seq_length = 0;                     // length of the read
     uint32_t nread = 0;                          // number of read analyzed
 
-    // use c funtionc getline which allocate memory if line=NULL & len=0,
+    // use c funtion getline, for popen function, which allocate memory if line=NULL & len=0,
     // line has to be freed at the end
     char * line = NULL;                          // char* to each line read in hfastq
-    size_t len = 0;                              // length of buffer line read by getline
-    ssize_t linelen;                             // length of line read by getline, include \0
     uint32_t nline_read = 0;                     // store number of line read in hfastq
 
     // Create the *char to store the tag sequence if output_read is yes and there is match
@@ -636,21 +654,39 @@ int main (int argc, char *argv[]) {
       cerr << "Paired mode ON, getrev = " << to_string(getrev) << ", for file " << parse.nonOption(sample) << endl;
 
     string read_header = "";
-    while ((linelen = getline(&line, &len, hfastq)) != -1) {
-      /*cerr << "DEBUG read line : " << nline_read << endl;*/
-      // store read header
+    while (read_aline(read_header, hfastq)) {
+      //cerr << "DEBUG read line : " << nline_read << "\t" << read_header << endl;
+      // we got a fastq read: 4 lines
       if (nline_read % 4 == 0) {
-        read_header = line;
-        // remove newline char
-        read_header.erase(read_header.size() - 1);
-        /*cerr << "DEBUG\tread a header" << endl;*/
-      }
+        char * read_seq = NULL;
+        string temp;
+        string read_qc {};
 
-      // If this line is a sequence
-      if (nline_read % 4 == 1) {
-        /*cerr << "DEBUG\tread a seq : " << line << endl;*/
+        // get seq
+        if (read_aline(temp, hfastq)) {
+          // read_seq is char *, to convert
+          read_seq = new char[temp.size()+1];; //memory allocated
+          strcpy(read_seq, temp.c_str());
+          //cerr << "DEBUG\tread a seq : " << std::string(read_seq) << endl;
+          seq_length = temp.size();
+        } else {
+          cerr << "Get a partial read : " << read_header << endl;
+          exit(2);
+        }
+        // get empty header
+        if (!read_aline(temp, hfastq)) {
+          cerr << "Get a partial read : " << read_header << endl;
+          exit(3);
+        }
+        // get qc line
+        if (!read_aline(read_qc, hfastq)) {
+          cerr << "Get a partial read : " << read_header << endl;
+          exit(4);
+        }
+
+        nline_read +=4; // we have read 3 more lines
         // how many read are analyzed
-        nread = ((int)((double)nline_read*0.25) + 1);
+        nread ++;
         if (nread >= max_reads) {
           break;
         }
@@ -658,8 +694,6 @@ int main (int argc, char *argv[]) {
         if (verbose > 1 && nread % MILLION == 0) {
           cerr << nread << " reads parsed" << endl;
         }
-        // set seq to line
-        seq_length = linelen - 1; // Minus 1 because we have a new line character
         // Skip the sequence if the read length is < to the tag_length
         if (seq_length < tag_length) {
           /*cerr << "read smaller than kmer: read length = " << seq_length  << endl;*/
@@ -667,15 +701,16 @@ int main (int argc, char *argv[]) {
           continue;
         }
 
-        /*cerr << "DEBUG\tconvert to kmer: " << endl;*/
+        //cerr << "DEBUG\tconvert to kmer: " << endl;
         nb_tags = seq_length - tag_length + 1;
         nb_factors += nb_tags;
         last = -3;
 
         // keep all kmers find in this read
         vector<uint64_t> kmers_find;
+//          cerr << "read_seq" << read_seq << endl;
         for (uint32_t i = 0; i < nb_tags; i++) {
-          it_counts = tags_counts.find(valns(i, line, tag_length, &last, &valfwd, &valrev, isstranded, getrev));
+          it_counts = tags_counts.find(valns(i, read_seq, tag_length, &last, &valfwd, &valrev, isstranded, getrev));
           // did we find a tag in the seq
           if (it_counts != tags_counts.end()) {
             it_counts->second[sample]++;
@@ -703,8 +738,10 @@ int main (int argc, char *argv[]) {
             }
             hfile_read << "\t" << parse.nonOption(sample) << "\t" << read_header << "\t" << line;
         }
+      } else {                                          // end of nread % 4
+          cerr << "Get a partial read : " << read_header << endl;
+          exit(11);
       }
-      nline_read++;
     }                                            // end of while reading hfastq file
 
     // store statistic
