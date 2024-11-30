@@ -1,7 +1,7 @@
 # [X] 20241120-01 : Do not check if true fastq
     - say nothing if not a not a true fastq
 
-# [ ] 20241113-01 : In few fastq files, all kmers are count to 0
+# [X] 20241113-01 : In few fastq files, all kmers are count to 0
     - happens on crozet data microglie
     - when a read smaller than k
 

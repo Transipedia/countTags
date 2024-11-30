@@ -696,8 +696,7 @@ int main (int argc, char *argv[]) {
         }
         // Skip the sequence if the read length is < to the tag_length
         if (seq_length < tag_length) {
-          /*cerr << "read smaller than kmer: read length = " << seq_length  << endl;*/
-          nline_read++;
+          cerr << "read smaller than kmer: read length = " << seq_length  << endl;
           continue;
         }
 
