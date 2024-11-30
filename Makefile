@@ -21,7 +21,7 @@ clean:
 	rm -df $(BIN_DIR)
 
 $(SRC_DIR)/%.o: $(SRC_DIR)/%.cpp
-	$(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(CXX) $(CXXFLAGS) $(LIBS) -o $@ -c $<
 
 $(BIN_DIR)/%: $(SRC_DIR)/%.cpp $(OBJECTS)
 	mkdir -p $(BIN_DIR)
