@@ -195,7 +195,7 @@ const option::Descriptor usage[] =
   {UNKNOWN,      0, "", "",
     option::Arg::None, "Options:" },
   {KMER_LENGTH, 0, "k","",
-    Arg::Numeric,      "  -k INT      \ttag length [default: 22]." },
+    Arg::Numeric,      "  -k INT      \ttag length [default: 31]." },
   {MAX_READS,    0, "", "maxreads",
     Arg::Numeric,      "  --maxreads INT      \tmax number of reads to analyze [default: INT32_MAX]." },
   //{NB_THREADS, 0, "t","",
@@ -251,7 +251,7 @@ int main (int argc, char *argv[]) {
 
   // Options vars
   int verbose = 0;                               // --verbose: verbose level
-  uint32_t tag_length = 31;                      // -k: default kmer length
+  uint32_t tag_length = 31;                      // default kmer length (-k)
   uint32_t max_reads = UINT32_MAX;               // --maxreads: max number of reads to analyze
 //int nb_threads = 1;                            // --threads: unused
   bool isstranded = false;                       // --stranded: is data stranded
