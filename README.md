@@ -63,3 +63,27 @@ In this case the values are millions of tag/kmer in each sample.
 You can normalize by billions of tag/kmer using the option `-b|--billions`.
 It will be the default normalization from version 1.0.
 
+### Output reads
+
+You can use option `-r|--reads` to output reads that are matched by a tag/kmer.
+
+If more than one tag/kmer match a read, the read is output only once with all tag/kmer sequences and names separates by a comma.
+
+The output format is a tabular file with :
+
+ * all tag/kmer sequences matching the read
+ * names of all tag/kmers if option `-t|--tag-names`
+ * fastq file name
+ * read header
+ * read sequence
+ * read quality line
+
+A fastq file for each input fastq files are generated with the name:
+
+ * name_given_with_option--reads + "-" + input fastq file.
+
+```
+  countTags -i test/TAGS_test.csv -k 30 --tag-names --reads /tmp/reads test/test_?.fastq.gz
+  ls /tmp/reads*
+  # /tmp/reads  /tmp/reads-test_1.fastq  /tmp/reads-test_2.fastq
+```

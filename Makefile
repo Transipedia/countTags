@@ -1,6 +1,6 @@
 SHELL=bash
 CXX := g++
-CXXFLAGS := -O4 -std=c++11 -Wall
+CXXFLAGS := -O4 -std=c++17 -Wall
 LIBS := -Isrc/zstr/src
 libo := -lz
 SRC_DIR := src

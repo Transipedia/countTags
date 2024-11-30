@@ -32,6 +32,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <filesystem>
 #include <fstream>
 #include <iterator>
 #include <string.h>
@@ -605,6 +606,7 @@ int main (int argc, char *argv[]) {
 
     // local vars specific to each sample
     FILE * hfastq;                               // handle to fastq file
+    ofstream hfile_outfastq;                     // file handle to write a fastq file of matching kmer
     uint32_t seq_length = 0;                     // length of the read
     uint32_t nread = 0;                          // number of read analyzed
 
@@ -636,6 +638,18 @@ int main (int argc, char *argv[]) {
     // use bool getrev to get the reverse complement when rf/fr/ff
     bool getrev = false;
 
+    // open file to output fastq data in fastq format not tabular
+    if (output_read.length()) {
+      filesystem::path outfastq_name {output_read};
+        outfastq_name += "-";
+        outfastq_name += filesystem::path(parse.nonOption(sample)).stem();
+      hfile_outfastq.open(outfastq_name, ifstream::out);
+      // check if not write error
+      if (hfile_outfastq.fail()) {
+        cerr << "Error: Can't write read matching kmer in file "<< outfastq_name << endl;
+        return 1;
+      }
+    }
     if (ispaired) {
       if ( string(parse.nonOption(sample)).find("_1.fastq") != string::npos) {
         // we got the first pair
@@ -727,14 +741,15 @@ int main (int argc, char *argv[]) {
               intToDNA(i, tag_length, tag_seq);
               temp_seq.push_back(std::string(tag_seq));
               if (print_tag_names) {
-                temp_tagname = tags_names[i];
+                temp_tagname.push_back(join(tags_names[i],","));
               }
             }
             hfile_read << join(temp_seq, ",");
             if (print_tag_names) {
               hfile_read << "\t" << join(temp_tagname, ",");
             }
-            hfile_read << "\t" << parse.nonOption(sample) << "\t" << read_header << "\t" << read_qc << "\t" << line;
+            hfile_read << "\t" << parse.nonOption(sample) << "\t" << read_header << "\t" << read_seq << "\t" << read_qc << "\n";
+            hfile_outfastq << read_header << "\n" << read_seq << "\n+\n" << read_qc << "\n";
         }
       } else {                                          // end of nread % 4
           cerr << "Get a partial read : " << read_header << endl;

@@ -1,7 +1,7 @@
 include Makefile.ref
 SHELL:=/bin/bash
 
-all: clean test_ok test_stranded test_error_parsing test_error_fastq
+all: clean test_ok test_stranded test_error_parsing test_error_fastq test_reads
 	@if [ -e /tmp/$(ofile).error ]; then echo -e "$(RED)ERROR HAPPENS$(NoColor)" ; else echo -e "\n$(GREEN)ALL FINE$(NoColor)" ; rm /tmp/$(ofile)*; fi
 
 test_ok:
@@ -25,6 +25,11 @@ test_stranded:
 	@echo -e "$(PURPLE)Test with stranded option:$(NoColor)"
 	@for f in fas tsv csv; do ../bin/countTags --tag-names -k 30 --stranded -i $(okfile).$$f test_?.fastq.gz 2>/tmp/$(ofile)_names_$${f}_okstranded.cerr | sort > /tmp/$(ofile)_names_$${f}_okstranded.txt; done
 	@for i in /tmp/$(ofile)_names_*_okstranded.txt; do echo -e "$(BROWNBG)$$i$(NoColor)"; diff $$i stranded/$(ofile)_with_names_ok.txt; if [ $$? -eq 0 ]; then echo -e "$(GREEN)ok$(NoColor)"; else echo -e "$(RED)ERROR$(NoColor)"; echo "1" > /tmp/$(ofile).error; fi;done
+
+test_reads:
+	@echo -e "$(PURPLE)Test reads output option:$(NoColor)"
+	@../bin/countTags --tag-names -k 30 -i $(okfile).csv -r /tmp/$(ofile)-reads test_?.fastq.gz 2>/tmp/$(ofile)_names_$${f}_reads.cerr > /dev/null
+	@for i in /tmp/$(ofile)-reads* ; do echo -e "$(BROWNBG)$$i$(NoColor):"; diff $$i ok/$$(basename $$i); if [ $$? -eq 0 ]; then echo -e "$(GREEN)ok$(NoColor)"; else echo -e "$(RED)ERROR$(NoColor)"; echo "1" > /tmp/$(ofile).error; fi;done
 
 init:
 	rm -f $(okfile).*
