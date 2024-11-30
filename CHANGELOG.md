@@ -1,6 +1,125 @@
 Changelog
 =========
 
+countTags/0.6.1 (2024-11-30) [Anthony Boureux]
+----------------------------
+
+## New
+
+ * Output all reads matching one or more kmer in tabular and fasq format.
+
+### Fix
+
+ * Correct default k value to 31.
+
+countTags/0.6.0 (2024-11-30) [Anthony Boureux]
+----------------------------
+
+
+### New
+
+ * with option -r: output all data (header, sequence and quality code) to build a true fastq file
+   - for now 
+
+### Changes
+
+ * Improve help and README.
+ * Improve make test output.
+  * better output with color
+   * correct test with diff
+ * Add code to debug, commented for now.
+
+### Fix
+
+ * Correct 20241113-01 but read smaller than k.
+   - error with nline counter
+   - corrected with bug 20241120-01
+ * Correct bug 20241120-01 not checking truncated fastq.
+ * Correct 20241113-01: forget to count the current line when read smaller than k.
+ * Improve comments.
+ * When output reads, output only once the read.
+  * The read was output each time a kmer was found in the read
+ * Minor: Update doc to install with zstr lib.
+
+### Todo
+
+ * Count twice when paired and overlapping.
+
+
+countTags/0.5.2 (2020-04-19) [Anthony Boureux]
+----------------------------
+
+
+### New
+
+ * Can use now ,; to separate tag and name.
+
+### Changes
+
+ * Improve color the make test.
+ * Use namespace to avoid all std::
+ * Minor: Correct g++ warnings.
+ * Improve comments.
+
+### Fix
+
+ * 20200419-01: do not output number of read in summary.
+   - closed: commit 459de402587.
+ * Minor: Exit with code 10 when error reading tags or fastq.
+ * Minor: Correct error with submodule.
+ * Zstr: Integrated correctly the submodule.
+
+countTags/0.5.1 (2020-03-26) [Anthony Boureux]
+----------------------------
+
+
+### Changes
+
+ * Typo correction.
+ * Remove require for --merge-counts when using --merge-counts-colname.
+   - setting the second, set the first
+
+### Fix
+
+ * 20200326-01 : No normalization (closed).
+
+countTags/0.5.0 (2020-03-10) [Anthony Boureux]
+----------------------------
+
+
+### Changes
+
+ * To get statistic, use -v or --summary, remove other output to stdin other than table count.
+ * Remove dirname if present in fastq filename.
+
+
+countTags/0.4.7 (2020-03-10) [Anthony Boureux]
+----------------------------
+
+
+### New
+
+ * Manage Tags in gz or not format, also from STDIN.
+ * Add option to analyze all kmers in tags provided.
+ * Use option -o to output merged tsv files in a file, otherwise output to stdout.
+ * Add option to group summary like tsv files.
+ * Shell script to merge count of countTags in one file.
+
+### Fix
+
+ * Improve help for new gzip format for TAGS.
+ * Correct g++ warnings.
+ * Do not need -s option, the script take care of the filename.
+ * Add option nostranded, usefull in script.
+  * this option exist only to avoid an empty option when testing multiple options
+
+### Other
+
+ * Add submodule info.
+ * Minor: Improve help and verbose mode.
+ * Minor: fix error in usage help.
+ * Add return code for function.
+
 
 countTags/0.4.5 (2020-03-08) [Anthony Boureux]
 ----------------------------

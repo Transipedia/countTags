@@ -87,3 +87,7 @@ A fastq file for each input fastq files are generated with the name:
   ls /tmp/reads*
   # /tmp/reads  /tmp/reads-test_1.fastq  /tmp/reads-test_2.fastq
 ```
+
+## Bugs
+
+ * 20210425-01 : Count twice the read if read are paired and overlapping
