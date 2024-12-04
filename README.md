@@ -2,8 +2,8 @@
 
 ## Installation
 
-1. Clone this repository : `git clone --recursive https://gitlab:get/counttags.git`
-    or git clone https://gitlab:get/counttags.git && git submodule init && git submodule update
+1. Clone this repository : `git clone --recursive https://github.com/Transipedia/countTags.git`
+    or git clone https://github.com/Transipedia/countTags.git && git submodule init && git submodule update
 2. Compile the software : `make`
 3. Place the binary in a directory which is in your `$PATH`
 
