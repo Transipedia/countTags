@@ -1,4 +1,4 @@
-# countTags - counting a set of k-mers into a set of FASTQ files
+# countTags - counting a set of k-mers from a set of FASTQ files
 
 ## Installation
 
@@ -9,24 +9,75 @@
 
 ## Usage
 
-First you need to create a file containing the tags/kmers you want to quantify.
+>
+> countTags -k 31 -i my_kmers.file.tsv data1.fastq.gz data2.fastq.gz ...
+>
 
-You can use three tags/kmers format:
+You need two files:
+ * a file with the kmers that you want quantify in fastq data.
+ * one or more fastq data file (compressed with gz or not)
+
+### Input format for kmers
+
+You create a file containing the tags/kmers you want to quantify.
+
+This file can be in three tags/kmers differents formats:
 
  * fasta format
- * separator format : sequence name (the separator can be a space or a tabulation or a comma or a semi-comma)
- * raw format : only the tag/kmer sequence
+ * or separator format : sequence name (the separator can be a space or a tabulation or a comma or a semi-comma)
+ * or raw format : only the tag/kmer sequence
 
-You must use option '-i' to specify the tag/kmer file.  You can provide the tag/kmer
+* As fasta format:
+
+```
+>kmer.1
+CACGTACTACGTTGTAGCCCACTTCCACTA
+>kmer.2
+GCGGGGTCGAAGAAGGTGGTGTTGAGGTTG
+>kmer.3
+GTTGGCCGAGTGGAGACTGGTGTTCTCAAA
+>kmer.4
+TGTTGCCATGGTAATCCTGCTCAGTACGAG
+>kmer.5
+GCTTAGGCAGAAGCCCTATTACTTTGCAAG
+>kmer.6
+ATAGGGGAAATCAGTGAATGAAGCCTCCTA
+```
+
+ * As csv/tsv format:
+
+```
+CACGTACTACGTTGTAGCCCACTTCCACTA;kmer.1
+GCGGGGTCGAAGAAGGTGGTGTTGAGGTTG;kmer.2
+GTTGGCCGAGTGGAGACTGGTGTTCTCAAA;kmer.3
+TGTTGCCATGGTAATCCTGCTCAGTACGAG;kmer.4
+GCTTAGGCAGAAGCCCTATTACTTTGCAAG;kmer.5
+ATAGGGGAAATCAGTGAATGAAGCCTCCTA;kmer.6
+```
+
+ * As raw format:
+
+```
+CACGTACTACGTTGTAGCCCACTTCCACTA
+GCGGGGTCGAAGAAGGTGGTGTTGAGGTTG
+GTTGGCCGAGTGGAGACTGGTGTTCTCAAA
+TGTTGCCATGGTAATCCTGCTCAGTACGAG
+GCTTAGGCAGAAGCCCTATTACTTTGCAAG
+ATAGGGGAAATCAGTGAATGAAGCCTCCTA
+```
+
+You must use option '-i' to specify this kmers file.  You can provide the kmer
 file via the standard input by using '-i -' as filename.  If you file is
 gziped, you can pass directly with the '-i mytags.gz' option or the pipe if
 needed, but if it is in other compression format, uncompress the file with the
 right tool and pass to countTags via the pipe and option '-i -'.
 
+### kmers length
+
 All tags/kmers must have at least the K-mer length, if too short, tags/kmers are discarded.
 They are print to STDERR.
 
-The maximum authorize tag length is 32bp (one integer).
+The maximum authorize tag length is 32 bp (one integer).
 
 K-mer length can be provided to countTags using the `-k INT` option to change the default option = 31 (from version 0.6).
 
