@@ -69,9 +69,10 @@ bool read_aline (string &astr, FILE * hfile)
   }
   astr = line;
   astr.erase(astr.size() - 1);
+  // free memory to avoid memory leak
+  if (line)
+    free(line);
   return 1;
-  //  if (line)
-  //    free(line);
 }
 
 #endif
